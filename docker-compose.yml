@@ -1,0 +1,9 @@
+version: "3"
+
+services:
+  php-7.0-fpm:
+    container_name: php-7.0-fpm
+    build:
+      context: .
+      dockerfile: .docker/php-fpm/7.0/Dockerfile
+
