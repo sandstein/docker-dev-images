@@ -1,9 +1,9 @@
 ##############################################
 #
-# current version: 7.0.33
+# current version: 7.2.16
 #
 ##############################################
-FROM php:7.0-fpm
+FROM php:7.2-fpm
 
 ARG DISABLED_PHP_FPM_MODULES=""
 ARG USER_ID=33
@@ -105,7 +105,6 @@ RUN set -x \
         gettext \
         ldap \
         mysqli \
-        mcrypt \
         hash \
         pcntl \
         pdo_mysql \
@@ -152,6 +151,3 @@ RUN set -x \
         libzip-dev \
     && curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin/ --filename=composer \
     && docker-image-cleanup
-
-RUN source /usr/local/bin/disable_php_modules && \
-    disablePhpModules DISABLED_PHP_FPM_MODULES

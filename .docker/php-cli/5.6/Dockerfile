@@ -1,13 +1,13 @@
 ##############################################
 #
-# current version: 7.0.33
+# current version: 5.6.40
 #
 ##############################################
-FROM php:7.0-fpm
+FROM php:5.6-cli
 
-ARG DISABLED_PHP_FPM_MODULES=""
-ARG USER_ID=33
-ARG GROUP_ID=33
+ARG DISABLED_PHP_CLI_MODULES=""
+ARG USER_ID=1000
+ARG GROUP_ID=1000
 
 COPY files/usr/local/bin /usr/local/bin
 
@@ -125,12 +125,12 @@ RUN set -x \
         gettext \
         opcache \
     # Install extensions for PHP 7.x
-    && pecl install apcu \
-    && printf "no --disable-memcached-sasl\n" | pecl install memcached-3.0.4 \
+    && pecl install apcu-4.0.11 \
+    && printf "no --disable-memcached-sasl\n" | pecl install memcached-2.2.0 \
     && echo extension=memcached.so > /usr/local/etc/php/conf.d/memcached.ini \
     && pecl install redis \
     && pecl install mongodb \
-    && pecl install xdebug \
+    && pecl install xdebug-2.5.5 \
     && echo "zend_extension=xdebug.so" > /usr/local/etc/php/conf.d/xdebug.ini \
     && echo extension=apcu.so > /usr/local/etc/php/conf.d/apcu.ini \
     && echo extension=redis.so > /usr/local/etc/php/conf.d/redis.ini \
@@ -154,4 +154,7 @@ RUN set -x \
     && docker-image-cleanup
 
 RUN source /usr/local/bin/disable_php_modules && \
-    disablePhpModules DISABLED_PHP_FPM_MODULES
+    disablePhpModules DISABLED_PHP_CLI_MODULES
+
+RUN groupadd -g 1000 phpcli && \
+    useradd -u 1000 -g 1000 -m phpcli

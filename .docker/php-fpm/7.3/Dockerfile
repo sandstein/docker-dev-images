@@ -1,9 +1,9 @@
 ##############################################
 #
-# current version: 7.0.33
+# current version: 7.3.3
 #
 ##############################################
-FROM php:7.0-fpm
+FROM php:7.3-fpm
 
 ARG DISABLED_PHP_FPM_MODULES=""
 ARG USER_ID=33
@@ -105,7 +105,6 @@ RUN set -x \
         gettext \
         ldap \
         mysqli \
-        mcrypt \
         hash \
         pcntl \
         pdo_mysql \
@@ -126,8 +125,12 @@ RUN set -x \
         opcache \
     # Install extensions for PHP 7.x
     && pecl install apcu \
-    && printf "no --disable-memcached-sasl\n" | pecl install memcached-3.0.4 \
-    && echo extension=memcached.so > /usr/local/etc/php/conf.d/memcached.ini \
+    # Memcached for 7.3 can currently only be built from master
+    && MEMCACHED="`mktemp -d`" \
+    && curl -skL https://github.com/php-memcached-dev/php-memcached/archive/master.tar.gz | tar zxf - --strip-components 1 -C $MEMCACHED \
+    && docker-php-ext-configure $MEMCACHED \
+    && docker-php-ext-install $MEMCACHED \
+    && rm -rf $MEMCACHED \
     && pecl install redis \
     && pecl install mongodb \
     && pecl install xdebug \
@@ -152,6 +155,3 @@ RUN set -x \
         libzip-dev \
     && curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin/ --filename=composer \
     && docker-image-cleanup
-
-RUN source /usr/local/bin/disable_php_modules && \
-    disablePhpModules DISABLED_PHP_FPM_MODULES

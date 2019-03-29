@@ -1,9 +1,9 @@
 ##############################################
 #
-# current version: 7.0.33
+# current version: 7.1.27
 #
 ##############################################
-FROM php:7.0-fpm
+FROM php:7.1-fpm
 
 ARG DISABLED_PHP_FPM_MODULES=""
 ARG USER_ID=33

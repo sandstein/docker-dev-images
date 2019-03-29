@@ -1,9 +1,78 @@
 version: "3"
 
 services:
-  php-7.0-fpm:
-    container_name: php-7.0-fpm
+
+  #
+  # latest php 5.6
+  #
+  php-fpm-5.6:
+    container_name: php-fpm-5.6
+    build:
+      context: .
+      dockerfile: .docker/php-fpm/5.6/Dockerfile
+
+  php-cli-5.6:
+    container_name: php-cli-5.6
+    build:
+      context: .
+      dockerfile: .docker/php-cli/5.6/Dockerfile
+
+  #
+  # lastest php 7.0
+  #
+  php-fpm-7.0:
+    container_name: php-fpm-7.0
     build:
       context: .
       dockerfile: .docker/php-fpm/7.0/Dockerfile
 
+  php-cli-7.0:
+    container_name: php-cli-7.0
+    build:
+      context: .
+      dockerfile: .docker/php-cli/7.0/Dockerfile
+
+  #
+  # latest php 7.1
+  #
+  php-fpm-7.1:
+    container_name: php-fpm-7.1
+    build:
+      context: .
+      dockerfile: .docker/php-fpm/7.1/Dockerfile
+
+  php-cli-7.1:
+    container_name: php-cli-7.1
+    build:
+      context: .
+      dockerfile: .docker/php-cli/7.1/Dockerfile
+
+  #
+  # latest php 7.2
+  #
+  php-fpm-7.2:
+    container_name: php-fpm-7.2
+    build:
+      context: .
+      dockerfile: .docker/php-fpm/7.2/Dockerfile
+
+  php-cli-7.2:
+    container_name: php-cli-7.2
+    build:
+      context: .
+      dockerfile: .docker/php-cli/7.2/Dockerfile
+
+  #
+  # latest php 7.3
+  #
+  php-fpm-7.3:
+    container_name: php-fpm-7.3
+    build:
+      context: .
+      dockerfile: .docker/php-fpm/7.3/Dockerfile
+
+  php-cli-7.3:
+    container_name: php-cli-7.3
+    build:
+      context: .
+      dockerfile: .docker/php-cli/7.3/Dockerfile

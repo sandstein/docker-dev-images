@@ -1,13 +1,13 @@
 ##############################################
 #
-# current version: 7.0.33
+# current version: 7.2.16
 #
 ##############################################
-FROM php:7.0-fpm
+FROM php:7.2-cli
 
-ARG DISABLED_PHP_FPM_MODULES=""
-ARG USER_ID=33
-ARG GROUP_ID=33
+ARG DISABLED_PHP_CLI_MODULES=""
+ARG USER_ID=1000
+ARG GROUP_ID=1000
 
 COPY files/usr/local/bin /usr/local/bin
 
@@ -105,7 +105,6 @@ RUN set -x \
         gettext \
         ldap \
         mysqli \
-        mcrypt \
         hash \
         pcntl \
         pdo_mysql \
@@ -154,4 +153,7 @@ RUN set -x \
     && docker-image-cleanup
 
 RUN source /usr/local/bin/disable_php_modules && \
-    disablePhpModules DISABLED_PHP_FPM_MODULES
+    disablePhpModules DISABLED_PHP_CLI_MODULES
+
+RUN groupadd -g 1000 phpcli && \
+    useradd -u 1000 -g 1000 -m phpcli
