@@ -152,8 +152,5 @@ RUN set -x \
     && curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin/ --filename=composer \
     && docker-image-cleanup
 
-RUN source /usr/local/bin/disable_php_modules && \
-    disablePhpModules DISABLED_PHP_CLI_MODULES
-
 RUN groupadd -g 1000 phpcli && \
     useradd -u 1000 -g 1000 -m phpcli
