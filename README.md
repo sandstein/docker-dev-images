@@ -1,25 +1,21 @@
 # sandstein/php-docker
 
+## UserId and GroupId modifications
 
+ARG USER_ID=999
+ARG GROUP_ID=999
+RUN modify-ids mysql ${USER_ID} ${GROUP_ID}
 
-## CLI Customisation
+## CLI Modules Customisation
 
-RUN source /usr/local/bin/disable_php_modules && \
-    disablePhpModules $DISABLED_PHP_CLI_MODULES
+ARG DISABLED_PHP_CLI_MODULES=''
+RUN disable-php-modules ${DISABLED_PHP_CLI_MODULES}
 
-RUN source /usr/local/bin/modify_ids \
-    modifyUserId phpcli $USER_ID \
-    modifyGroupId phpcli $GROUP_ID
+## FPM Modules Customisation    
     
-## FPM Customisation    
+ARG DISABLED_PHP_FPM_MODULES=''
+RUN disable-php-modules ${DISABLED_PHP_FPM_MODULES}
     
-RUN source /usr/local/bin/disable_php_modules && \
-    disablePhpModules $DISABLED_PHP_FPM_MODULES
-
-RUN source /usr/local/bin/modify_ids \
-    modifyUserId phpcli $USER_ID \
-    modifyGroupId phpcli $GROUP_ID
-       
 ## Modules enabled by default
 * apcu
 * bcmath
