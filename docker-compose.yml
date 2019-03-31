@@ -76,3 +76,120 @@ services:
     build:
       context: .
       dockerfile: .docker/php-cli/7.3/Dockerfile
+
+  #
+  # mysql 5.5.62
+  #
+  mysql-5.5:
+      container_name: mysql-5.5
+      build:
+        context: .
+        dockerfile: .docker/mysql/5.5/Dockerfile
+
+  #
+  # mysql 5.6.43
+  #
+  mysql-5.6:
+    container_name: mysql-5.6
+    build:
+      context: .
+      dockerfile: .docker/mysql/5.6/Dockerfile
+
+  #
+  # mysql 5.7.25
+  #
+  mysql-5.7:
+    container_name: mysql-5.7
+    build:
+      context: .
+      dockerfile: .docker/mysql/5.7/Dockerfile
+
+  #
+  # mysql 8.0.15
+  #
+  mysql-8.0:
+    container_name: mysql-8.0
+    build:
+      context: .
+      dockerfile: .docker/mysql/8.0/Dockerfile
+
+  #
+  # percona 5.6.43
+  #
+  percona-5.6:
+    container_name: percona-5.6
+    build:
+      context: .
+      dockerfile: .docker/percona/5.6/Dockerfile
+
+  #
+  # percona 5.7.25
+  #
+  percona-5.7:
+    container_name: percona-5.7
+    build:
+      context: .
+      dockerfile: .docker/percona/5.7/Dockerfile
+
+  #
+  # percona 8.0.15
+  #
+  percona-8.0:
+    container_name: percona-8.0
+    build:
+      context: .
+      dockerfile: .docker/percona/8.0/Dockerfile
+
+  #
+  # mariadb 5.5.63
+  #
+  mariadb-5.5:
+    container_name: mariadb-5.5
+    build:
+      context: .
+      dockerfile: .docker/mariadb/5.5/Dockerfile
+
+  #
+  # mariadb 10.0.38
+  #
+  mariadb-10.0:
+    container_name: mariadb-10.0
+    build:
+      context: .
+      dockerfile: .docker/mariadb/10.0/Dockerfile
+
+  #
+  # mariadb 10.1.38
+  #
+  mariadb-10.1:
+    container_name: mariadb-10.1
+    build:
+      context: .
+      dockerfile: .docker/mariadb/10.1/Dockerfile
+
+  #
+  # mariadb 10.2.23
+  #
+  mariadb-10.2:
+    container_name: mariadb-10.2
+    build:
+      context: .
+      dockerfile: .docker/mariadb/10.2/Dockerfile
+
+  #
+  # mariadb 10.3.13
+  #
+  mariadb-10.3:
+    container_name: mariadb-10.3
+    build:
+      context: .
+      dockerfile: .docker/mariadb/10.3/Dockerfile
+
+  #
+  # mariadb 10.4.3
+  #
+  mariadb-10.4:
+    container_name: mariadb-10.4
+    build:
+      context: .
+      dockerfile: .docker/mariadb/10.4/Dockerfile
