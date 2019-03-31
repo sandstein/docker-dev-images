@@ -5,10 +5,6 @@
 ##############################################
 FROM php:7.1-cli
 
-ARG DISABLED_PHP_CLI_MODULES=""
-ARG USER_ID=1000
-ARG GROUP_ID=1000
-
 COPY files/usr/local/bin /usr/local/bin
 
 RUN set -x \

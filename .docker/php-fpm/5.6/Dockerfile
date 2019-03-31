@@ -5,10 +5,6 @@
 ##############################################
 FROM php:5.6-fpm
 
-ARG DISABLED_PHP_FPM_MODULES=""
-ARG USER_ID=33
-ARG GROUP_ID=33
-
 COPY files/usr/local/bin /usr/local/bin
 
 RUN set -x \
