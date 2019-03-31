@@ -1,15 +1,15 @@
-#!/bin/sh
+#!/bin/bash
 
 disablePhpModules() {
-    if [[ -n "{$1+x}" ]]; then
-        DISABLED=" "$1" "
+    if [ -n "{$1+x}" ]; then
+        DISABLED=","$1","
         OLD_PWD=$(pwd)
         cd /usr/local/etc/php/conf.d
         for inifile in *; do
             tmp=${inifile%.ini}
             extension=${tmp#docker-php-ext-}
-            extensionpattern=" "${extension}" "
-            if [ ! "${DISABLED#$extensionpattern}" = "${DISABLED}" ]; then
+            extensionpattern=","${extension}","
+            if [ ! "${DISABLED/$extensionpattern}" = "${DISABLED}" ]; then
                   echo "################# disabeling ${extension} #########################"
                   sed -i 's/^/;/' ${inifile}
             fi
@@ -17,3 +17,5 @@ disablePhpModules() {
         cd ${OLD_PWD}
     fi
 }
+
+disablePhpModules "$1"
