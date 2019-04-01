@@ -131,6 +131,12 @@ RUN set -x \
     && echo extension=apcu.so > /usr/local/etc/php/conf.d/apcu.ini \
     && echo extension=redis.so > /usr/local/etc/php/conf.d/redis.ini \
     && echo extension=mongodb.so > /usr/local/etc/php/conf.d/mongodb.ini \
+    # install ioncube
+    && wget http://downloads3.ioncube.com/loader_downloads/ioncube_loaders_lin_x86-64.tar.gz -O /tmp/ioncube_loaders_lin_x86-64.tar.gz \
+    && tar -xzf /tmp/ioncube_loaders_lin_x86-64.tar.gz -C /tmp \
+    && cp /tmp/ioncube/ioncube_loader_lin_5.6.so  /usr/local/lib/php/extensions/no-debug-non-zts-20151012 \
+    && echo "zend_extension=ioncube_loader_lin_5.6.so" > /usr/local/etc/php/conf.d/00_ioncube.ini \
+    && rm -rf /tmp/ioncube* \
     # Uninstall dev and header packages
     && apt-get purge -y -f --force-yes \
         libc-client-dev \

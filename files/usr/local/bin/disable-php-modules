@@ -7,7 +7,8 @@ disablePhpModules() {
         cd /usr/local/etc/php/conf.d
         for inifile in *; do
             tmp=${inifile%.ini}
-            extension=${tmp#docker-php-ext-}
+            tmp2=${tmp#00_}
+            extension=${tmp2#docker-php-ext-}
             extensionpattern=","${extension}","
             if [ ! "${DISABLED/$extensionpattern}" = "${DISABLED}" ]; then
                   echo "################# disabeling ${extension} #########################"

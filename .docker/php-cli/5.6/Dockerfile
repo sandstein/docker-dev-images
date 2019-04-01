@@ -44,6 +44,8 @@ RUN set -x \
         rsync \
         git \
         patch \
+        # add mysqlclient to be able to access mysql from cli
+        mysql-client \
     && /usr/local/bin/generate-locales \
     && docker-image-cleanup
 
@@ -87,8 +89,6 @@ RUN set -x \
         libzip-dev \
         libc-client-dev \
         libkrb5-dev \
-        # add mysqlclient for stuff
-        mysql-client \
     # Install extensions
     && docker-php-ext-configure gd --with-freetype-dir=/usr/include/ --with-jpeg-dir=/usr/include/ \
     && docker-php-ext-configure ldap --with-libdir=lib/x86_64-linux-gnu/ \
@@ -122,7 +122,7 @@ RUN set -x \
         gd \
         gettext \
         opcache \
-    # Install extensions for PHP 7.x
+    # Install extensions for PHP 5.6
     && pecl install apcu-4.0.11 \
     && printf "no --disable-memcached-sasl\n" | pecl install memcached-2.2.0 \
     && echo extension=memcached.so > /usr/local/etc/php/conf.d/memcached.ini \
@@ -133,6 +133,12 @@ RUN set -x \
     && echo extension=apcu.so > /usr/local/etc/php/conf.d/apcu.ini \
     && echo extension=redis.so > /usr/local/etc/php/conf.d/redis.ini \
     && echo extension=mongodb.so > /usr/local/etc/php/conf.d/mongodb.ini \
+    # install ioncube
+    && wget http://downloads3.ioncube.com/loader_downloads/ioncube_loaders_lin_x86-64.tar.gz -O /tmp/ioncube_loaders_lin_x86-64.tar.gz \
+    && tar -xzf /tmp/ioncube_loaders_lin_x86-64.tar.gz -C /tmp \
+    && cp /tmp/ioncube/ioncube_loader_lin_5.6.so  /usr/local/lib/php/extensions/no-debug-non-zts-20151012 \
+    && echo "zend_extension=ioncube_loader_lin_5.6.so" > /usr/local/etc/php/conf.d/00_ioncube.ini \
+    && rm -rf /tmp/ioncube* \
     # Uninstall dev and header packages
     && apt-get purge -y -f --force-yes \
         libc-client-dev \
@@ -152,4 +158,6 @@ RUN set -x \
     && docker-image-cleanup
 
 RUN groupadd -g 1000 phpcli && \
-    useradd -u 1000 -g 1000 -m phpcli
+    useradd -u 1000 -g 1000 -m -s /usr/bash phpcli
+
+VOLUME /home/phpcli/.ssh /home/phpcli/.config
