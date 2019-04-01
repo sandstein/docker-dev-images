@@ -87,6 +87,8 @@ RUN set -x \
         libzip-dev \
         libc-client-dev \
         libkrb5-dev \
+        # add mysqlclient for stuff
+        mysql-client \
     # Install extensions
     && docker-php-ext-configure gd --with-freetype-dir=/usr/include/ --with-jpeg-dir=/usr/include/ \
     && docker-php-ext-configure ldap --with-libdir=lib/x86_64-linux-gnu/ \
