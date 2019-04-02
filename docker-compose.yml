@@ -9,13 +9,13 @@ services:
     container_name: php-fpm-5.6
     build:
       context: .
-      dockerfile: .docker/php-fpm/5.6/Dockerfile
+      dockerfile: docker/php-fpm/5.6/Dockerfile
 
   php-cli-5.6:
     container_name: php-cli-5.6
     build:
       context: .
-      dockerfile: .docker/php-cli/5.6/Dockerfile
+      dockerfile: docker/php-cli/5.6/Dockerfile
 
   #
   # lastest php 7.0
@@ -24,13 +24,13 @@ services:
     container_name: php-fpm-7.0
     build:
       context: .
-      dockerfile: .docker/php-fpm/7.0/Dockerfile
+      dockerfile: docker/php-fpm/7.0/Dockerfile
 
   php-cli-7.0:
     container_name: php-cli-7.0
     build:
       context: .
-      dockerfile: .docker/php-cli/7.0/Dockerfile
+      dockerfile: docker/php-cli/7.0/Dockerfile
 
   #
   # latest php 7.1
@@ -39,13 +39,13 @@ services:
     container_name: php-fpm-7.1
     build:
       context: .
-      dockerfile: .docker/php-fpm/7.1/Dockerfile
+      dockerfile: docker/php-fpm/7.1/Dockerfile
 
   php-cli-7.1:
     container_name: php-cli-7.1
     build:
       context: .
-      dockerfile: .docker/php-cli/7.1/Dockerfile
+      dockerfile: docker/php-cli/7.1/Dockerfile
 
   #
   # latest php 7.2
@@ -54,13 +54,13 @@ services:
     container_name: php-fpm-7.2
     build:
       context: .
-      dockerfile: .docker/php-fpm/7.2/Dockerfile
+      dockerfile: docker/php-fpm/7.2/Dockerfile
 
   php-cli-7.2:
     container_name: php-cli-7.2
     build:
       context: .
-      dockerfile: .docker/php-cli/7.2/Dockerfile
+      dockerfile: docker/php-cli/7.2/Dockerfile
 
   #
   # latest php 7.3
@@ -69,13 +69,13 @@ services:
     container_name: php-fpm-7.3
     build:
       context: .
-      dockerfile: .docker/php-fpm/7.3/Dockerfile
+      dockerfile: docker/php-fpm/7.3/Dockerfile
 
   php-cli-7.3:
     container_name: php-cli-7.3
     build:
       context: .
-      dockerfile: .docker/php-cli/7.3/Dockerfile
+      dockerfile: docker/php-cli/7.3/Dockerfile
 
   #
   # mysql 5.5.62
@@ -84,7 +84,7 @@ services:
       container_name: mysql-5.5
       build:
         context: .
-        dockerfile: .docker/mysql/5.5/Dockerfile
+        dockerfile: docker/mysql/5.5/Dockerfile
 
   #
   # mysql 5.6.43
@@ -93,7 +93,7 @@ services:
     container_name: mysql-5.6
     build:
       context: .
-      dockerfile: .docker/mysql/5.6/Dockerfile
+      dockerfile: docker/mysql/5.6/Dockerfile
 
   #
   # mysql 5.7.25
@@ -102,7 +102,7 @@ services:
     container_name: mysql-5.7
     build:
       context: .
-      dockerfile: .docker/mysql/5.7/Dockerfile
+      dockerfile: docker/mysql/5.7/Dockerfile
 
   #
   # mysql 8.0.15
@@ -111,7 +111,7 @@ services:
     container_name: mysql-8.0
     build:
       context: .
-      dockerfile: .docker/mysql/8.0/Dockerfile
+      dockerfile: docker/mysql/8.0/Dockerfile
 
   #
   # percona 5.6.43
@@ -120,7 +120,7 @@ services:
     container_name: percona-5.6
     build:
       context: .
-      dockerfile: .docker/percona/5.6/Dockerfile
+      dockerfile: docker/percona/5.6/Dockerfile
 
   #
   # percona 5.7.25
@@ -129,7 +129,7 @@ services:
     container_name: percona-5.7
     build:
       context: .
-      dockerfile: .docker/percona/5.7/Dockerfile
+      dockerfile: docker/percona/5.7/Dockerfile
 
   #
   # percona 8.0.15
@@ -138,7 +138,7 @@ services:
     container_name: percona-8.0
     build:
       context: .
-      dockerfile: .docker/percona/8.0/Dockerfile
+      dockerfile: docker/percona/8.0/Dockerfile
 
   #
   # mariadb 5.5.63
@@ -147,7 +147,7 @@ services:
     container_name: mariadb-5.5
     build:
       context: .
-      dockerfile: .docker/mariadb/5.5/Dockerfile
+      dockerfile: docker/mariadb/5.5/Dockerfile
 
   #
   # mariadb 10.0.38
@@ -156,7 +156,7 @@ services:
     container_name: mariadb-10.0
     build:
       context: .
-      dockerfile: .docker/mariadb/10.0/Dockerfile
+      dockerfile: docker/mariadb/10.0/Dockerfile
 
   #
   # mariadb 10.1.38
@@ -165,7 +165,7 @@ services:
     container_name: mariadb-10.1
     build:
       context: .
-      dockerfile: .docker/mariadb/10.1/Dockerfile
+      dockerfile: docker/mariadb/10.1/Dockerfile
 
   #
   # mariadb 10.2.23
@@ -174,7 +174,7 @@ services:
     container_name: mariadb-10.2
     build:
       context: .
-      dockerfile: .docker/mariadb/10.2/Dockerfile
+      dockerfile: docker/mariadb/10.2/Dockerfile
 
   #
   # mariadb 10.3.13
@@ -183,7 +183,7 @@ services:
     container_name: mariadb-10.3
     build:
       context: .
-      dockerfile: .docker/mariadb/10.3/Dockerfile
+      dockerfile: docker/mariadb/10.3/Dockerfile
 
   #
   # mariadb 10.4.3
@@ -192,4 +192,4 @@ services:
     container_name: mariadb-10.4
     build:
       context: .
-      dockerfile: .docker/mariadb/10.4/Dockerfile
+      dockerfile: docker/mariadb/10.4/Dockerfile
