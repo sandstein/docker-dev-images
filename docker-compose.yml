@@ -193,3 +193,13 @@ services:
     build:
       context: .
       dockerfile: docker/mariadb/10.4/Dockerfile
+
+
+  #
+  # apache 2.4.39
+  #
+  apache-2.4:
+    container_name: apache-2.4
+    build:
+      context: .
+      dockerfile: docker/apache/2.4/Dockerfile
