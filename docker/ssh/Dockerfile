@@ -5,7 +5,7 @@ COPY files/usr/local/bin /usr/local/bin
 #
 # Adds interactive user snm
 #
-RUN useradd -m -s /bin/bash snm && passwd -l snm
+RUN useradd -m -s /bin/bash ssh && passwd -l ssh
 
 RUN set -x \
     && apt-update \
@@ -22,7 +22,7 @@ RUN set -x \
         procps
 
 RUN set -x \
-    # Install packages and common toolsq
+    # Install packages and common tools
     && apt-install \
         wget \
         curl \
