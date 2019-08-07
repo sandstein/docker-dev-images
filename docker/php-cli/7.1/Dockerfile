@@ -45,7 +45,7 @@ RUN set -x \
         git \
         patch \
         # add mysqlclient to be able to access mysql from cli
-        mysql-client \
+        mariadb-client \
     && /usr/local/bin/generate-locales \
     && docker-image-cleanup
 
