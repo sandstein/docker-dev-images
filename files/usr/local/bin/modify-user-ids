@@ -11,9 +11,14 @@ modifyUserId() {
 }
 
 modifyGroupId() {
+
     if [[ -n "{$2+x}" ]]; then
-        groupmod -g $2 $1
-     fi
+        if grep -q $2 /etc/group; then
+            usermod -g $2 $1
+        else
+            groupmod -g $2 $1
+        fi
+    fi
 }
 
 modifyUserId $1 $2

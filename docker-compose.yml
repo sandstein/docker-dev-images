@@ -3,6 +3,15 @@ version: "3"
 services:
 
   #
+  # ssh for port forwarding
+  #
+  ssh:
+    container_name: ssh
+    build:
+      context: .
+      dockerfile: docker/ssh/Dockerfile
+
+  #
   # latest php 5.6
   #
   php-fpm-5.6:
