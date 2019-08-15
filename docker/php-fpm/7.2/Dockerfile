@@ -47,6 +47,9 @@ RUN set -x \
     && /usr/local/bin/generate-locales \
     && docker-image-cleanup
 
+
+RUN echo "deb http://deb.debian.org/debian stretch-backports main" >> /etc/apt/sources.list
+
 RUN set -x \
     # Install php environment
     && apt-install \
@@ -87,6 +90,8 @@ RUN set -x \
         libzip-dev \
         libc-client-dev \
         libkrb5-dev \
+    &&  apt-get -t stretch-backports install -y libsodium-dev
+    && doocker-php-ext install sodium
     # Install extensions
     && docker-php-ext-configure gd --with-freetype-dir=/usr/include/ --with-jpeg-dir=/usr/include/ \
     && docker-php-ext-configure ldap --with-libdir=lib/x86_64-linux-gnu/ \
