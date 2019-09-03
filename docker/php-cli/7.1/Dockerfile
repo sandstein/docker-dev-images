@@ -45,7 +45,8 @@ RUN set -x \
         git \
         patch \
         # add mysqlclient to be able to access mysql from cli
-        mysql-client \
+        mariadb-client \
+        mariadb-client \
     && /usr/local/bin/generate-locales \
     && docker-image-cleanup
 
@@ -136,9 +137,12 @@ RUN set -x \
     # install ioncube
     && wget http://downloads3.ioncube.com/loader_downloads/ioncube_loaders_lin_x86-64.tar.gz -O /tmp/ioncube_loaders_lin_x86-64.tar.gz \
     && tar -xzf /tmp/ioncube_loaders_lin_x86-64.tar.gz -C /tmp \
-    && cp /tmp/ioncube/ioncube_loader_lin_7.1.so  /usr/local/lib/php/extensions/no-debug-non-zts-20151012 \
+    && cp /tmp/ioncube/ioncube_loader_lin_7.1.so  /usr/local/lib/php/extensions/no-debug-non-zts-20160303 \
     && echo "zend_extension=ioncube_loader_lin_7.1.so" > /usr/local/etc/php/conf.d/00_ioncube.ini \
     && rm -rf /tmp/ioncube* \
+    # install source guardian
+    && wget http://www.sourceguardian.com/loaders/download.php\?d=linux-x86_64\&ixed=ixed.7.1.lin -O /usr/local/lib/php/extensions/no-debug-non-zts-20160303/ixed.7.1.lin \
+    && echo "extension=ixed.7.1.lin" > /usr/local/etc/php/conf.d/sg.ini \
     # Uninstall dev and header packages
     && apt-get purge -y -f --force-yes \
         libc-client-dev \
