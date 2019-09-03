@@ -135,7 +135,7 @@ RUN set -x \
     && wget http://downloads3.ioncube.com/loader_downloads/ioncube_loaders_lin_x86-64.tar.gz -O /tmp/ioncube_loaders_lin_x86-64.tar.gz \
     && tar -xzf /tmp/ioncube_loaders_lin_x86-64.tar.gz -C /tmp \
     && cp /tmp/ioncube/ioncube_loader_lin_7.1.so  /usr/local/lib/php/extensions/no-debug-non-zts-20160303 \
-    && echo "zend_extension=ioncube_loader_lin_7.0.so" > /usr/local/etc/php/conf.d/00_ioncube.ini \
+    && echo "zend_extension=ioncube_loader_lin_7.1.so" > /usr/local/etc/php/conf.d/00_ioncube.ini \
     && rm -rf /tmp/ioncube* \
     # install source guardian
     && wget http://www.sourceguardian.com/loaders/download.php\?d=linux-x86_64\&ixed=ixed.7.1.lin -O /usr/local/lib/php/extensions/no-debug-non-zts-20160303/ixed.7.1.lin \
