@@ -1,6 +1,6 @@
 ##############################################
 #
-# current version: 7.2.16
+# current version: 7.2.21
 #
 ##############################################
 FROM php:7.2-cli
@@ -44,6 +44,8 @@ RUN set -x \
         rsync \
         git \
         patch \
+        # add mysqlclient to be able to access mysql from cli
+        mariadb-client \
     && /usr/local/bin/generate-locales \
     && docker-image-cleanup
 
@@ -87,8 +89,6 @@ RUN set -x \
         libzip-dev \
         libc-client-dev \
         libkrb5-dev \
-        # add mysqlclient to be able to access mysql from cli
-        mysql-client \
     # Install extensions
     && docker-php-ext-configure gd --with-freetype-dir=/usr/include/ --with-jpeg-dir=/usr/include/ \
     && docker-php-ext-configure ldap --with-libdir=lib/x86_64-linux-gnu/ \
@@ -135,7 +135,7 @@ RUN set -x \
     # install ioncube
     && wget http://downloads3.ioncube.com/loader_downloads/ioncube_loaders_lin_x86-64.tar.gz -O /tmp/ioncube_loaders_lin_x86-64.tar.gz \
     && tar -xzf /tmp/ioncube_loaders_lin_x86-64.tar.gz -C /tmp \
-    && cp /tmp/ioncube/ioncube_loader_lin_7.2.so  /usr/local/lib/php/extensions/no-debug-non-zts-20151012 \
+    && cp /tmp/ioncube/ioncube_loader_lin_7.2.so  /usr/local/lib/php/extensions/no-debug-non-zts-20170718 \
     && echo "zend_extension=ioncube_loader_lin_7.2.so" > /usr/local/etc/php/conf.d/00_ioncube.ini \
     && rm -rf /tmp/ioncube* \
     # Uninstall dev and header packages

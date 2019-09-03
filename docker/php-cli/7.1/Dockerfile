@@ -1,6 +1,6 @@
 ##############################################
 #
-# current version: 7.1.27
+# current version: 7.1.31
 #
 ##############################################
 FROM php:7.1-cli
@@ -45,7 +45,6 @@ RUN set -x \
         git \
         patch \
         # add mysqlclient to be able to access mysql from cli
-        mariadb-client \
         mariadb-client \
     && /usr/local/bin/generate-locales \
     && docker-image-cleanup
