@@ -134,7 +134,7 @@ RUN set -x \
     # install ioncube
     && wget http://downloads3.ioncube.com/loader_downloads/ioncube_loaders_lin_x86-64.tar.gz -O /tmp/ioncube_loaders_lin_x86-64.tar.gz \
     && tar -xzf /tmp/ioncube_loaders_lin_x86-64.tar.gz -C /tmp \
-    && cp /tmp/ioncube/ioncube_loader_lin_5.6.so  /usr/local/lib/php/extensions/no-debug-non-zts-20151012 \
+    && cp /tmp/ioncube/ioncube_loader_lin_5.6.so  /usr/local/lib/php/extensions/no-debug-non-zts-20131226 \
     && echo "zend_extension=ioncube_loader_lin_5.6.so" > /usr/local/etc/php/conf.d/00_ioncube.ini \
     && rm -rf /tmp/ioncube* \
     # Uninstall dev and header packages
