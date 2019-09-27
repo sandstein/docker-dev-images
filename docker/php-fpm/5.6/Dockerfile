@@ -124,7 +124,7 @@ RUN set -x \
     && pecl install apcu-4.0.11 \
     && printf "no --disable-memcached-sasl\n" | pecl install memcached-2.2.0 \
     && echo extension=memcached.so > /usr/local/etc/php/conf.d/memcached.ini \
-    && pecl install redis \
+    && pecl install redis-4.3.0 \
     && pecl install mongodb \
     && pecl install xdebug-2.5.5 \
     && echo "zend_extension=xdebug.so" > /usr/local/etc/php/conf.d/xdebug.ini \
