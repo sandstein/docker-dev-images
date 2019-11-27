@@ -137,6 +137,9 @@ RUN set -x \
     && cp /tmp/ioncube/ioncube_loader_lin_7.0.so  /usr/local/lib/php/extensions/no-debug-non-zts-20151012 \
     && echo "zend_extension=ioncube_loader_lin_7.0.so" > /usr/local/etc/php/conf.d/00_ioncube.ini \
     && rm -rf /tmp/ioncube* \
+    # install source guardian
+    && wget http://www.sourceguardian.com/loaders/download.php\?d=linux-x86_64\&ixed=ixed.7.0.lin -O /usr/local/lib/php/extensions/no-debug-non-zts-20151012/ixed.7.0.lin \
+    && echo "extension=ixed.7.0.lin" > /usr/local/etc/php/conf.d/sg.ini \
     # Uninstall dev and header packages
     && apt-get purge -y -f --force-yes \
         libc-client-dev \
