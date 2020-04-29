@@ -85,7 +85,20 @@ services:
     build:
       context: .
       dockerfile: docker/php-cli/7.3/Dockerfile
+  #
+  # latest php 7.3
+  #
+  php-fpm-7.4:
+    container_name: php-fpm-7.4
+    build:
+      context: .
+      dockerfile: docker/php-fpm/7.4/Dockerfile
 
+  php-cli-7.4:
+    container_name: php-cli-7.4
+    build:
+      context: .
+      dockerfile: docker/php-cli/7.4/Dockerfile
   #
   # mysql 5.5.62
   #
@@ -121,15 +134,6 @@ services:
     build:
       context: .
       dockerfile: docker/mysql/8.0/Dockerfile
-
-  #
-  # percona 5.6.43
-  #
-  percona-5.6:
-    container_name: percona-5.6
-    build:
-      context: .
-      dockerfile: docker/percona/5.6/Dockerfile
 
   #
   # percona 5.7.25
