@@ -126,7 +126,7 @@ RUN set -x \
     && echo extension=memcached.so > /usr/local/etc/php/conf.d/memcached.ini \
     && pecl install redis \
     && pecl install mongodb \
-    && pecl install xdebug \
+    && pecl install xdebug-2.7.2 \
     && echo "zend_extension=xdebug.so" > /usr/local/etc/php/conf.d/xdebug.ini \
     && echo extension=apcu.so > /usr/local/etc/php/conf.d/apcu.ini \
     && echo extension=redis.so > /usr/local/etc/php/conf.d/redis.ini \
