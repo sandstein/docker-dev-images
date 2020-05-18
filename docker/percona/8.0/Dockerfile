@@ -97,6 +97,9 @@ RUN dpkg -i percona-release_latest.buster_all.deb ; \
   percona-release setup ${PERCONA_SETUP}; \
   apt-install percona-server-server-"$MYSQL_MAJOR"; \
   rm percona-release_latest.buster_all.deb
+RUN rm -rf /var/lib/mysql && mkdir -p /var/lib/mysql /var/run/mysqld \
+    	&& chown -R mysql:mysql /var/lib/mysql /var/run/mysqld \
+    	&& chmod 777 /var/run/mysqld
 
 VOLUME ["/var/lib/mysql", "/var/log/mysql"]
 
