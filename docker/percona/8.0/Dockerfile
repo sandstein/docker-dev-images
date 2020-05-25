@@ -95,7 +95,7 @@ RUN wget https://repo.percona.com/apt/percona-release_latest.buster_all.deb
 RUN dpkg -i percona-release_latest.buster_all.deb ; \
   apt-get update; \
   percona-release setup ${PERCONA_SETUP}; \
-  apt-install percona-server-server-"$MYSQL_MAJOR"; \
+  apt-install percona-server-server; \
   rm percona-release_latest.buster_all.deb
 RUN rm -rf /var/lib/mysql && mkdir -p /var/lib/mysql /var/run/mysqld \
     	&& chown -R mysql:mysql /var/lib/mysql /var/run/mysqld \
@@ -103,7 +103,7 @@ RUN rm -rf /var/lib/mysql && mkdir -p /var/lib/mysql /var/run/mysqld \
 
 VOLUME ["/var/lib/mysql", "/var/log/mysql"]
 
-RUN sed -i s"/^log-error/# log-error/g" /etc/mysql/percona-server.conf.d/mysqld.cnf
+RUN sed -i s"/^log-error/# log-error/g" /etc/mysql/mysql.conf.d/mysqld.cnf
 COPY files/entrypoints/percona-entry-"$MYSQL_MAJOR".sh /docker-entrypoint.sh
 ENTRYPOINT ["/docker-entrypoint.sh"]
 

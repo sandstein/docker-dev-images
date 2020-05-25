@@ -104,6 +104,8 @@ services:
   #
   mysql-5.5:
       container_name: mysql-5.5
+      environment:
+        - MYSQL_ALLOW_EMPTY_PASSWORD=true
       build:
         context: .
         dockerfile: docker/mysql/5.5/Dockerfile
@@ -113,6 +115,8 @@ services:
   #
   mysql-5.6:
     container_name: mysql-5.6
+    environment:
+      - MYSQL_ALLOW_EMPTY_PASSWORD=true
     build:
       context: .
       dockerfile: docker/mysql/5.6/Dockerfile
@@ -122,6 +126,8 @@ services:
   #
   mysql-5.7:
     container_name: mysql-5.7
+    environment:
+      - MYSQL_ALLOW_EMPTY_PASSWORD=true
     build:
       context: .
       dockerfile: docker/mysql/5.7/Dockerfile
@@ -131,6 +137,8 @@ services:
   #
   mysql-8.0:
     container_name: mysql-8.0
+    environment:
+      - MYSQL_ALLOW_EMPTY_PASSWORD=true
     build:
       context: .
       dockerfile: docker/mysql/8.0/Dockerfile
@@ -140,6 +148,8 @@ services:
   #
   percona-5.7:
     container_name: percona-5.7
+    environment:
+       - MYSQL_ALLOW_EMPTY_PASSWORD=true
     build:
       context: .
       dockerfile: docker/percona/5.7/Dockerfile
@@ -149,6 +159,8 @@ services:
   #
   percona-8.0:
     container_name: percona-8.0
+    environment:
+      - MYSQL_ALLOW_EMPTY_PASSWORD=true
     build:
       context: .
       dockerfile: docker/percona/8.0/Dockerfile
@@ -158,6 +170,8 @@ services:
   #
   mariadb-5.5:
     container_name: mariadb-5.5
+    environment:
+      - MYSQL_ALLOW_EMPTY_PASSWORD=true
     build:
       context: .
       dockerfile: docker/mariadb/5.5/Dockerfile
@@ -167,6 +181,8 @@ services:
   #
   mariadb-10.0:
     container_name: mariadb-10.0
+    environment:
+      - MYSQL_ALLOW_EMPTY_PASSWORD=true
     build:
       context: .
       dockerfile: docker/mariadb/10.0/Dockerfile
@@ -185,6 +201,8 @@ services:
   #
   mariadb-10.2:
     container_name: mariadb-10.2
+    environment:
+      - MYSQL_ALLOW_EMPTY_PASSWORD=true
     build:
       context: .
       dockerfile: docker/mariadb/10.2/Dockerfile
@@ -203,6 +221,8 @@ services:
   #
   mariadb-10.4:
     container_name: mariadb-10.4
+    environment:
+      - MYSQL_ALLOW_EMPTY_PASSWORD=true
     build:
       context: .
       dockerfile: docker/mariadb/10.4/Dockerfile
