@@ -103,6 +103,7 @@ RUN rm -rf /var/lib/mysql && mkdir -p /var/lib/mysql /var/run/mysqld \
 
 VOLUME ["/var/lib/mysql", "/var/log/mysql"]
 
+RUN sed -i s"/^log-error/# log-error/g" /etc/mysql/percona-server.conf.d/mysqld.cnf
 COPY files/entrypoints/percona-entry-"$MYSQL_MAJOR".sh /docker-entrypoint.sh
 ENTRYPOINT ["/docker-entrypoint.sh"]
 
