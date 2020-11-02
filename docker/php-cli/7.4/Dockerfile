@@ -180,7 +180,6 @@ RUN set -x \
         libpng-dev \
         libpq-dev \
         libzip-dev \
-    && curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin/ --filename=composer \
     && docker-image-cleanup
 
 RUN groupadd -g 1000 phpcli && \
