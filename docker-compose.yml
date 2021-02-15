@@ -40,6 +40,7 @@ services:
     build:
       context: .
       dockerfile: docker/php-cli/7.0/Dockerfile
+    tty: true
 
   #
   # latest php 7.1
@@ -55,6 +56,7 @@ services:
     build:
       context: .
       dockerfile: docker/php-cli/7.1/Dockerfile
+    tty: true
 
   #
   # latest php 7.2
@@ -70,6 +72,7 @@ services:
     build:
       context: .
       dockerfile: docker/php-cli/7.2/Dockerfile
+    tty: true
 
   #
   # latest php 7.3
@@ -85,8 +88,9 @@ services:
     build:
       context: .
       dockerfile: docker/php-cli/7.3/Dockerfile
+    tty: true
   #
-  # latest php 7.3
+  # latest php 7.4
   #
   php-fpm-7.4:
     container_name: php-fpm-7.4
@@ -99,6 +103,24 @@ services:
     build:
       context: .
       dockerfile: docker/php-cli/7.4/Dockerfile
+    tty: true
+
+  #
+  # latest php 8.0
+  #
+  php-fpm-8.0:
+    container_name: php-fpm-8.0
+    build:
+      context: .
+      dockerfile: docker/php-fpm/8.0/Dockerfile
+
+  php-cli-8.0:
+    container_name: php-cli-8.0
+    build:
+      context: .
+      dockerfile: docker/php-cli/8.0/Dockerfile
+    tty: true
+
   #
   # mysql 5.5.62
   #
