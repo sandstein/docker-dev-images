@@ -166,6 +166,14 @@ RUN set -x \
     # && echo "zend_extension=ioncube_loader_lin_7.4.so" > /usr/local/etc/php/conf.d/00_ioncube.ini \
     # && rm -rf /tmp/ioncube* \
     # Uninstall dev and header packages
+    # Install and enable Source Gaurdian loader
+    && mkdir -p /tmp/sourceguardian \
+    && cd /tmp/sourceguardian \
+    && curl -Os https://www.sourceguardian.com/loaders/download/loaders.linux-x86_64.tar.gz \
+    && tar xzf loaders.linux-x86_64.tar.gz \
+    && cp ixed.7.2.lin /usr/local/lib/php/extensions/no-debug-non-zts-20190902/sourceguardian.so \
+    && echo "extension=sourceguardian.so" > /usr/local/etc/php/conf.d/sourceguardian.ini \
+    && rm -rf /tmp/sourceguardian \
     && apt-get purge -y -f --force-yes \
         libc-client-dev \
         libkrb5-dev \
