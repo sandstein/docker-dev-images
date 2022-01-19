@@ -3,17 +3,88 @@ stages:
   - build
   - push
 
-# build
-build:
+# build apache
+build-apache:
   stage: build
   script:
-    - bin/build.sh
+    - bin/build.sh apache
   only:
     - /^master$/
     - tags
   tags:
     - shell
 
+
+# build mariadb
+build-mariadb:
+  stage: build
+  script:
+    - bin/build.sh mariadb
+  only:
+    - /^master$/
+    - tags
+  tags:
+    - shell
+
+
+# build mysql
+build-mysql:
+  stage: build
+  script:
+    - bin/build.sh mysql
+  only:
+    - /^master$/
+    - tags
+  tags:
+    - shell
+
+
+# build percona
+build-percona:
+  stage: build
+  script:
+    - bin/build.sh percona
+  only:
+    - /^master$/
+    - tags
+  tags:
+    - shell
+
+# build php
+build-php:
+  stage: build
+  script:
+    - bin/build.sh php
+  only:
+    - /^master$/
+    - tags
+  tags:
+    - shell
+
+# build selenium-side-runner
+build-selenium-side-runner:
+  stage: build
+  script:
+    - bin/build.sh selenium-side-runner
+  only:
+    - /^master$/
+    - tags
+  tags:
+    - shell
+
+# build ssh
+build-ssh:
+  stage: build
+  script:
+    - bin/build.sh ssh
+  only:
+    - /^master$/
+    - tags
+  tags:
+    - shell
+
+
+# push apache
 push-apache:
   stage: push
   script:
@@ -23,6 +94,7 @@ push-apache:
   only:
     - tags
 
+# push mariadb
 push-mariadb:
   stage: push
   script:
@@ -32,7 +104,7 @@ push-mariadb:
   only:
     - tags
 
-
+# push mysql
 push-mysql:
   stage: push
   script:
@@ -42,6 +114,7 @@ push-mysql:
   only:
     - tags
 
+# push percona
 push-percona:
   stage: push
   script:
@@ -51,6 +124,7 @@ push-percona:
   only:
     - tags
 
+# push php
 push-php:
   stage: push
   script:
@@ -60,6 +134,7 @@ push-php:
   only:
     - tags
 
+# push selenium-side-runner
 push-selenium-side-runner:
   stage: push
   script:
@@ -69,6 +144,7 @@ push-selenium-side-runner:
   only:
     - tags
 
+# push ssh
 push-ssh:
   stage: push
   script:
