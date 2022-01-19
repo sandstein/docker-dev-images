@@ -1,6 +1,6 @@
 #!/bin/bash
 
-BUILD_ARGS="--force-rm --pull"
+BUILD_ARGS="--force-rm --pull --quiet"
 PWD=$(pwd)
 PROJECT_NAME=$(basename "${PWD}")
 
