@@ -49,7 +49,7 @@ done
 tag_version "mariadb" "10.2" "10.2 10.2.41"
 tag_version "mariadb" "10.3" "10.3 10.3.32"
 tag_version "mariadb" "10.4" "10.4 10.4.22"
-tag_version "mariadb" "10.5" "10.5 10.5.32"
+tag_version "mariadb" "10.5" "10.5 10.5.13"
 tag_version "mariadb" "10.6" "10.6 10.6.5 latest"
 tag_version "mariadb" "10.7" "10.7 10.7.1"
 
@@ -63,7 +63,7 @@ tag_version "mysql" "5.7" "5.7 5.36"
 tag_version "mysql" "8.0" "8.0 8.0.27 latest"
 
 # percona (https://hub.docker.com/r/percona/percona-server)
-for version in 5.6 5.7 8.0
+for version in 5.7 8.0
 do
   docker-compose build ${BUILD_ARGS} "percona-$version"
 done
