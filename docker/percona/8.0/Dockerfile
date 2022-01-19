@@ -61,7 +61,7 @@ RUN wget https://repo.percona.com/apt/percona-release_latest.buster_all.deb
 RUN dpkg -i percona-release_latest.buster_all.deb ; \
   apt-get update; \
   percona-release setup ${PERCONA_SETUP}; \
-  apt-install percona-server-server-"$MYSQL_MAJOR";; \
+  apt-install percona-server-server-"$MYSQL_MAJOR"; \
   rm percona-release_latest.buster_all.deb
 RUN rm -rf /var/lib/mysql && mkdir -p /var/lib/mysql /var/run/mysqld \
     	&& chown -R mysql:mysql /var/lib/mysql /var/run/mysqld \
