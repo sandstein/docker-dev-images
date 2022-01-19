@@ -9,7 +9,7 @@ build:
   script:
     - bin/build.sh
   only:
-    - /^testing$/
+    - /^master$/
     - tags
   tags:
     - shell
