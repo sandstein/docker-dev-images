@@ -1,4 +1,4 @@
-FROM php:8.0-cli
+FROM php:8.1-cli
 
 COPY files/usr/local/bin /usr/local/bin
 
@@ -84,7 +84,6 @@ RUN set -x \
       soap \
       sockets \
       solr \
-      sourceguardian \
       sysvmsg \
       sysvsem \
       sysvshm \

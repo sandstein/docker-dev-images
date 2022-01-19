@@ -1,4 +1,4 @@
-FROM mariadb:10.0
+FROM mariadb:10.7
 
 COPY files/usr/local/bin /usr/local/bin
 

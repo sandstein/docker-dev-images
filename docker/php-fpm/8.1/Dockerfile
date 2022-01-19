@@ -1,4 +1,4 @@
-FROM php:8.0-cli
+FROM php:8.1-fpm
 
 COPY files/usr/local/bin /usr/local/bin
 
@@ -39,12 +39,8 @@ RUN set -x \
         rsync \
         git \
         patch \
-        # add mysqlclient to be able to access mysql from cli
-        mariadb-client \
     && /usr/local/bin/generate-locales \
     && docker-image-cleanup
-
-ADD https://github.com/mlocati/docker-php-extension-installer/releases/latest/download/install-php-extensions /usr/local/bin/
 
 RUN set -x \
     && chmod +x /usr/local/bin/install-php-extensions \
@@ -84,7 +80,6 @@ RUN set -x \
       soap \
       sockets \
       solr \
-      sourceguardian \
       sysvmsg \
       sysvsem \
       sysvshm \
@@ -98,8 +93,3 @@ RUN set -x \
       zip \
       zstd \
     && docker-image-cleanup
-
-RUN groupadd -g 1000 phpcli && \
-    useradd -u 1000 -g 1000 -m -s /usr/bash phpcli
-
-VOLUME /home/phpcli/.ssh /home/phpcli/.config

@@ -1,0 +1,79 @@
+
+stages:
+  - build
+  - push
+
+# build
+build:
+  stage: build
+  script:
+    - bin/build.sh
+  only:
+    - /^testing$/
+    - tags
+  tags:
+    - shell
+
+push-apache:
+  stage: push
+  script:
+    - bin/push apache
+  tags:
+    - shell
+  only:
+    - tags
+
+push-mariadb:
+  stage: push
+  script:
+    - bin/push mariadb
+  tags:
+    - shell
+  only:
+    - tags
+
+
+push-mysql:
+  stage: push
+  script:
+    - bin/push mysql
+  tags:
+    - shell
+  only:
+    - tags
+
+push-percona:
+  stage: push
+  script:
+    - bin/push percona
+  tags:
+    - shell
+  only:
+    - tags
+
+push-php:
+  stage: push
+  script:
+    - bin/push php
+  tags:
+    - shell
+  only:
+    - tags
+
+push-selenium-side-runner:
+  stage: push
+  script:
+    - bin/push selenium-side-runner
+  tags:
+    - shell
+  only:
+    - tags
+
+push-ssh:
+  stage: push
+  script:
+    - bin/push ssh
+  tags:
+    - shell
+  only:
+    - tags

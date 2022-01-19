@@ -1,6 +1,8 @@
-FROM mysql:5.5
+FROM node:lts-bullseye-slim
 
 COPY files/usr/local/bin /usr/local/bin
+
+
 
 RUN set -x \
     && apt-update \
@@ -17,19 +19,13 @@ RUN set -x \
         procps
 
 RUN set -x \
-    # Install packages
+    # Install packages and common tools
     && apt-install \
         wget \
         curl \
         vim \
         net-tools \
         tzdata \
-    && docker-image-cleanup
-
-RUN set -x \
-    # Install services
-    && apt-install \
-        # Install common tools
         zip \
         unzip \
         bzip2 \
@@ -41,3 +37,9 @@ RUN set -x \
         patch \
     && /usr/local/bin/generate-locales \
     && docker-image-cleanup
+
+RUN npm install -g selenium-side-runner
+
+#
+# use node as user
+#

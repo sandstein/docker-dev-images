@@ -12,69 +12,6 @@ services:
       dockerfile: docker/ssh/Dockerfile
 
   #
-  # latest php 5.6
-  #
-  php-fpm-5.6:
-    container_name: php-fpm-5.6
-    build:
-      context: .
-      dockerfile: docker/php-fpm/5.6/Dockerfile
-
-  php-cli-5.6:
-    container_name: php-cli-5.6
-    build:
-      context: .
-      dockerfile: docker/php-cli/5.6/Dockerfile
-
-  #
-  # lastest php 7.0
-  #
-  php-fpm-7.0:
-    container_name: php-fpm-7.0
-    build:
-      context: .
-      dockerfile: docker/php-fpm/7.0/Dockerfile
-
-  php-cli-7.0:
-    container_name: php-cli-7.0
-    build:
-      context: .
-      dockerfile: docker/php-cli/7.0/Dockerfile
-    tty: true
-
-  #
-  # latest php 7.1
-  #
-  php-fpm-7.1:
-    container_name: php-fpm-7.1
-    build:
-      context: .
-      dockerfile: docker/php-fpm/7.1/Dockerfile
-
-  php-cli-7.1:
-    container_name: php-cli-7.1
-    build:
-      context: .
-      dockerfile: docker/php-cli/7.1/Dockerfile
-    tty: true
-
-  #
-  # latest php 7.2
-  #
-  php-fpm-7.2:
-    container_name: php-fpm-7.2
-    build:
-      context: .
-      dockerfile: docker/php-fpm/7.2/Dockerfile
-
-  php-cli-7.2:
-    container_name: php-cli-7.2
-    build:
-      context: .
-      dockerfile: docker/php-cli/7.2/Dockerfile
-    tty: true
-
-  #
   # latest php 7.3
   #
   php-fpm-7.3:
@@ -104,7 +41,6 @@ services:
       context: .
       dockerfile: docker/php-cli/7.4/Dockerfile
     tty: true
-
   #
   # latest php 8.0
   #
@@ -119,6 +55,21 @@ services:
     build:
       context: .
       dockerfile: docker/php-cli/8.0/Dockerfile
+    tty: true
+  #
+  # latest php 8.1
+  #
+  php-fpm-8.1:
+    container_name: php-fpm-8.1
+    build:
+      context: .
+      dockerfile: docker/php-fpm/8.1/Dockerfile
+
+  php-cli-8.1:
+    container_name: php-cli-8.1
+    build:
+      context: .
+      dockerfile: docker/php-cli/8.1/Dockerfile
     tty: true
 
   #
@@ -189,34 +140,34 @@ services:
 
   #
   # mariadb 5.5.63
-  #
-  mariadb-5.5:
-    container_name: mariadb-5.5
-    environment:
-      - MYSQL_ALLOW_EMPTY_PASSWORD=true
-    build:
-      context: .
-      dockerfile: docker/mariadb/5.5/Dockerfile
+  # outdated
+  #mariadb-5.5:
+  #  container_name: mariadb-5.5
+  #  environment:
+  #    - MYSQL_ALLOW_EMPTY_PASSWORD=true
+  #  build:
+  #    context: .
+  #    dockerfile: docker/mariadb/5.5/Dockerfile
 
   #
   # mariadb 10.0.38
-  #
-  mariadb-10.0:
-    container_name: mariadb-10.0
-    environment:
-      - MYSQL_ALLOW_EMPTY_PASSWORD=true
-    build:
-      context: .
-      dockerfile: docker/mariadb/10.0/Dockerfile
+  # outdated
+  # mariadb-10.0:
+  #  container_name: mariadb-10.0
+  #  environment:
+  #    - MYSQL_ALLOW_EMPTY_PASSWORD=true
+  #  build:
+  #    context: .
+  #    dockerfile: docker/mariadb/10.0/Dockerfile
 
   #
   # mariadb 10.1.38
-  #
-  mariadb-10.1:
-    container_name: mariadb-10.1
-    build:
-      context: .
-      dockerfile: docker/mariadb/10.1/Dockerfile
+  # outdated
+  # mariadb-10.1:
+  #  container_name: mariadb-10.1
+  #  build:
+  #    context: .
+  #    dockerfile: docker/mariadb/10.1/Dockerfile
 
   #
   # mariadb 10.2.23
@@ -249,7 +200,29 @@ services:
       context: .
       dockerfile: docker/mariadb/10.4/Dockerfile
 
+  mariadb-10.5:
+    container_name: mariadb-10.5
+    environment:
+      - MYSQL_ALLOW_EMPTY_PASSWORD=true
+    build:
+      context: .
+      dockerfile: docker/mariadb/10.5/Dockerfile
 
+  mariadb-10.6:
+    container_name: mariadb-10.6
+    environment:
+      - MYSQL_ALLOW_EMPTY_PASSWORD=true
+    build:
+      context: .
+      dockerfile: docker/mariadb/10.6/Dockerfile
+
+  mariadb-10.7:
+    container_name: mariadb-10.7
+    environment:
+      - MYSQL_ALLOW_EMPTY_PASSWORD=true
+    build:
+      context: .
+      dockerfile: docker/mariadb/10.7/Dockerfile
   #
   # apache 2.4.39
   #
@@ -258,3 +231,10 @@ services:
     build:
       context: .
       dockerfile: docker/apache/2.4/Dockerfile
+
+  selenium-side-runner:
+    container_name: selenium-side-runner
+    build:
+      context: .
+      dockerfile: docker/selenium-side-runner/Dockerfile
+    tty: true

@@ -1,4 +1,4 @@
-FROM debian:stretch-slim
+FROM debian:bullseye-slim
 
 COPY files/usr/local/bin /usr/local/bin
 
