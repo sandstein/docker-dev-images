@@ -1,11 +1,13 @@
 #!/bin/bash
 
-BUILD_ARGS="--force-rm --pull --quiet"
+BUILD_ARGS="--force-rm --pull"
+PWD=$(pwd)
+PROJECT_NAME=$(basename "${PWD}")
 
 tag() {
   for tag in $2
   do
-    docker tag "dev-images_$1:latest" "sandstein/$1:$tag"
+    docker tag "${PROJECT_NAME}_$1:latest" "sandstein/$1:$tag"
   done
 
 }
@@ -13,15 +15,19 @@ tag() {
 tag_version() {
   for tag in $3
   do
-    docker tag "dev-images_$1-$2:latest" "sandstein/$1:$tag"
+    docker tag "${PROJECT_NAME}_$1-$2:latest" "sandstein/$1:$tag"
   done
 }
 
 tag_php_version() {
   for tag in $4
   do
-    docker tag "dev-images_$1-$2:latest" "sandstein/$1:$2-$tag"
+    docker tag "${PROJECT_NAME}_$1-$2:latest" "sandstein/$1:$2-$tag"
   done
+}
+
+test() {
+  echo $PROJECT_NAME;
 }
 
 case $1 in
@@ -98,4 +104,6 @@ do
 done
 ;;
 
+*)
+  test
 esac

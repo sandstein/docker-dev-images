@@ -139,37 +139,6 @@ services:
       dockerfile: docker/percona/8.0/Dockerfile
 
   #
-  # mariadb 5.5.63
-  # outdated
-  #mariadb-5.5:
-  #  container_name: mariadb-5.5
-  #  environment:
-  #    - MYSQL_ALLOW_EMPTY_PASSWORD=true
-  #  build:
-  #    context: .
-  #    dockerfile: docker/mariadb/5.5/Dockerfile
-
-  #
-  # mariadb 10.0.38
-  # outdated
-  # mariadb-10.0:
-  #  container_name: mariadb-10.0
-  #  environment:
-  #    - MYSQL_ALLOW_EMPTY_PASSWORD=true
-  #  build:
-  #    context: .
-  #    dockerfile: docker/mariadb/10.0/Dockerfile
-
-  #
-  # mariadb 10.1.38
-  # outdated
-  # mariadb-10.1:
-  #  container_name: mariadb-10.1
-  #  build:
-  #    context: .
-  #    dockerfile: docker/mariadb/10.1/Dockerfile
-
-  #
   # mariadb 10.2.23
   #
   mariadb-10.2:
