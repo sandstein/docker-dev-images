@@ -4,32 +4,17 @@ COPY files/usr/local/bin /usr/local/bin
 
 RUN set -x \
     && apt-update \
-    # Enable non-free
-    && apt-update \
-    # System update
-    && /usr/local/bin/apt-upgrade \
-    # Base stuff
     && apt-install \
         apt-transport-https \
         ca-certificates \
         locales \
         gnupg \
-        procps
-
-RUN set -x \
-    # Install packages
-    && apt-install \
+        procps \
         wget \
         curl \
         vim \
         net-tools \
         tzdata \
-    && docker-image-cleanup
-
-RUN set -x \
-    # Install services
-    && apt-install \
-        # Install common tools
         zip \
         unzip \
         bzip2 \
@@ -42,7 +27,7 @@ RUN set -x \
         # add mysqlclient to be able to access mysql from cli
         mariadb-client \
     && /usr/local/bin/generate-locales \
-    && docker-image-cleanup
+    && docker-image-cleanup \
 
 ADD https://github.com/mlocati/docker-php-extension-installer/releases/latest/download/install-php-extensions /usr/local/bin/
 

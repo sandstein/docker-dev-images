@@ -4,32 +4,17 @@ COPY files/usr/local/bin /usr/local/bin
 
 RUN set -x \
     && apt-update \
-    # Enable non-free
-    && apt-update \
-    # System update
-    && /usr/local/bin/apt-upgrade \
-    # Base stuff
     && apt-install \
         apt-transport-https \
         ca-certificates \
         locales \
         gnupg \
-        procps
-
-RUN set -x \
-    # Install packages
-    && apt-install \
+        procps \
         wget \
         curl \
         vim \
         net-tools \
-        tzdata \
-    && docker-image-cleanup
-
-RUN set -x \
-    # Install services
-    && apt-install \
-        # Install common tools
+        tzdata  \
         zip \
         unzip \
         bzip2 \
@@ -41,6 +26,8 @@ RUN set -x \
         patch \
     && /usr/local/bin/generate-locales \
     && docker-image-cleanup
+
+ADD https://github.com/mlocati/docker-php-extension-installer/releases/latest/download/install-php-extensions /usr/local/bin/
 
 RUN set -x \
     && chmod +x /usr/local/bin/install-php-extensions \
