@@ -158,7 +158,7 @@ build-ssh:
 push-apache:
   stage: push
   script:
-    - bin/push apache
+    - bin/push.sh apache
   tags:
     - shell
   only:
@@ -168,7 +168,7 @@ push-apache:
 push-mariadb:
   stage: push
   script:
-    - bin/push mariadb
+    - bin/push.sh mariadb
   tags:
     - shell
   only:
@@ -178,7 +178,7 @@ push-mariadb:
 push-mysql:
   stage: push
   script:
-    - bin/push mysql
+    - bin/push.sh mysql
   tags:
     - shell
   only:
@@ -188,7 +188,7 @@ push-mysql:
 push-percona:
   stage: push
   script:
-    - bin/push percona
+    - bin/push.sh percona
   tags:
     - shell
   only:
@@ -198,7 +198,7 @@ push-percona:
 push-php:
   stage: push
   script:
-    - bin/push php
+    - bin/push.sh php
   tags:
     - shell
   only:
@@ -208,7 +208,7 @@ push-php:
 push-selenium-side-runner:
   stage: push
   script:
-    - bin/push selenium-side-runner
+    - bin/push.sh selenium-side-runner
   tags:
     - shell
   only:
@@ -218,7 +218,7 @@ push-selenium-side-runner:
 push-ssh:
   stage: push
   script:
-    - bin/push ssh
+    - bin/push.sh ssh
   tags:
     - shell
   only:
