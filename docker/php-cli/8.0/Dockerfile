@@ -100,6 +100,6 @@ RUN set -x \
     && docker-image-cleanup
 
 RUN groupadd -g 1000 phpcli && \
-    useradd -u 1000 -g 1000 -m -s /usr/bash phpcli
+    useradd -u 1000 -g 1000 -m -s /bin/bash phpcli
 
 VOLUME /home/phpcli/.ssh /home/phpcli/.config

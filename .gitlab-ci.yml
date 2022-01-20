@@ -51,10 +51,80 @@ build-percona:
     - shell
 
 # build php
-build-php:
+build-php-cli-7.3:
   stage: build
   script:
-    - bin/build.sh php
+    - bin/build.sh php cli 7.3
+  only:
+    - /^master$/
+    - tags
+  tags:
+    - shell
+
+build-php-fpm-7.3:
+  stage: build
+  script:
+    - bin/build.sh php fpm 7.3
+  only:
+    - /^master$/
+    - tags
+  tags:
+    - shell
+
+build-php-cli-7.4:
+  stage: build
+  script:
+    - bin/build.sh php cli 7.4
+  only:
+    - /^master$/
+    - tags
+  tags:
+    - shell
+
+build-php-fpm-7.4:
+  stage: build
+  script:
+    - bin/build.sh php fpm 7.4
+  only:
+    - /^master$/
+    - tags
+  tags:
+    - shell
+
+build-php-cli-8.0:
+  stage: build
+  script:
+    - bin/build.sh php cli 8.0
+  only:
+    - /^master$/
+    - tags
+  tags:
+    - shell
+
+build-php-fpm-8.0:
+  stage: build
+  script:
+    - bin/build.sh php fpm 8.0
+  only:
+    - /^master$/
+    - tags
+  tags:
+    - shell
+
+build-php-cli-8.1:
+  stage: build
+  script:
+    - bin/build.sh php cli 8.1
+  only:
+    - /^master$/
+    - tags
+  tags:
+    - shell
+
+build-php-fpm-8.1:
+  stage: build
+  script:
+    - bin/build.sh php fpm 8.1
   only:
     - /^master$/
     - tags
