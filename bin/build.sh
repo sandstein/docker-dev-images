@@ -22,7 +22,7 @@ tag_version() {
 tag_php_version() {
   for tag in $3
   do
-    docker tag "${PROJECT_NAME}_php-$1-$2" "sandstein/$1:$2-$tag"
+    docker tag "${PROJECT_NAME}_php-$1-$2" "sandstein/php:$1-$tag"
   done
 }
 
