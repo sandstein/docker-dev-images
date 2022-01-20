@@ -2,25 +2,14 @@ FROM node:lts-bullseye-slim
 
 COPY files/usr/local/bin /usr/local/bin
 
-
-
 RUN set -x \
     && apt-update \
-    # Enable non-free
-    && apt-update \
-    # System update
-    && /usr/local/bin/apt-upgrade \
-    # Base stuff
     && apt-install \
         apt-transport-https \
         ca-certificates \
         locales \
         gnupg \
-        procps
-
-RUN set -x \
-    # Install packages and common tools
-    && apt-install \
+        procps \
         wget \
         curl \
         vim \
