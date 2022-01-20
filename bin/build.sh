@@ -20,9 +20,9 @@ tag_version() {
 }
 
 tag_php_version() {
-  for tag in $4
+  for tag in $3
   do
-    docker tag "${PROJECT_NAME}_$1-$2:latest" "sandstein/$1:$2-$tag"
+    docker tag "${PROJECT_NAME}_php-$1-$2" "sandstein/$1:$2-$tag"
   done
 }
 
@@ -31,7 +31,7 @@ get_php_version()  {
 }
 
 get_mysql_version() {
-  docker-compose run --rm "mysql-$1" mysqld --version | cut -d " " -f3
+  docker-compose run --rm "mysql-$1" mysqld --version | cut -d " " -f4
 }
 
 get_percona_version() {
@@ -117,52 +117,9 @@ php)
 # php (cli and fpm) (https://hub.docker.com/_/php/)
   type=$2
   version=$3
-  case $version in
-    7.3)
-      case $type in
-        cli)
-          docker-compose build "${BUILD_ARGS}" "php-${type}-${version}"
-          ;;
-        fpm)
-          docker-compose build "${BUILD_ARGS}" "php-${type}-${version}"
-          ;;
-      esac
-      tag_php_version "php" "$type" "7.3" "7.3 $(get_php_version "$type" 7.3)"
-      ;;
-    7.4)
-      case $type in
-        cli)
-          docker-compose build "${BUILD_ARGS}" "php-${type}-${version}"
-          ;;
-        fpm)
-          docker-compose build "${BUILD_ARGS}" "php-${type}-${version}"
-          ;;
-      esac
-      tag_php_version "php ""$type" "7.4" "7.4 $(get_php_version "$type" 7.4)"
-      ;;
-    8.0)
-      case $type in
-        cli)
-          docker-compose build "${BUILD_ARGS}" "php-${type}-${version}"
-          ;;
-        fpm)
-          docker-compose build "${BUILD_ARGS}" "php-${type}-${version}"
-          ;;
-      esac
-      tag_php_version "php" "$type" "8.0" "8.0 $(get_php_version "$type" 8.0)"
-      ;;
-    8.1)
-      case $type in
-        cli)
-          docker-compose build "${BUILD_ARGS}" "php-${type}-${version}"
-          ;;
-        fpm)
-          docker-compose build "${BUILD_ARGS}" "php-${type}-${version}"
-          ;;
-      esac
-      tag_php_version "php" "$type" "8.1" "8.1 $(get_php_version "$type" 8.1)"
-      ;;
-  esac
+  target="php-$type-$version"
+  docker-compose build ${BUILD_ARGS} $target
+  tag_php_version $type $version "$version $(get_php_version "$type" $version)"
 ;;
 
 *)

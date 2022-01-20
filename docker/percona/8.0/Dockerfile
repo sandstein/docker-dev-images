@@ -4,34 +4,20 @@ FROM debian:buster-slim
 RUN groupadd -r mysql && useradd -r -g mysql mysql
 
 COPY files/usr/local/bin /usr/local/bin
+
 RUN set -x \
     && apt-update \
-    # Enable non-free
-    && apt-update \
-    # System update
-    && /usr/local/bin/apt-upgrade \
-    # Base stuff
     && apt-install \
         apt-transport-https \
         ca-certificates \
         locales \
         gnupg \
-        procps
-
-RUN set -x \
-    # Install packages
-    && apt-install \
+        procps \
         wget \
         curl \
         vim \
         net-tools \
         tzdata \
-    && docker-image-cleanup
-
-RUN set -x \
-    # Install services
-    && apt-install \
-        # Install common tools
         zip \
         unzip \
         bzip2 \
@@ -42,17 +28,14 @@ RUN set -x \
         git \
         patch \
         lsb-release \
+        gnupg2 \
+        dirmngr \
+        pwgen \
+        openssl \
+        perl \
+        xz-utils \
     && /usr/local/bin/generate-locales \
     && docker-image-cleanup
-
-RUN apt-get update && apt-get install -y --no-install-recommends \
-  gnupg2 \
-  dirmngr \
-  pwgen \
-  openssl \
-  perl \
-  xz-utils \
-  && rm -rf /var/lib/apt/lists/*
 
 ENV PERCONA_SETUP ps80
 ENV MYSQL_MAJOR 8.0

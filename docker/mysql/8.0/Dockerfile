@@ -14,32 +14,17 @@ RUN set -ex; \
 
 RUN set -x \
     && apt-update \
-    # Enable non-free
-    && apt-update \
-    # System update
-    && /usr/local/bin/apt-upgrade \
-    # Base stuff
     && apt-install \
         apt-transport-https \
         ca-certificates \
         locales \
         gnupg \
-        procps
-
-RUN set -x \
-    # Install packages
-    && apt-install \
+        procps \
         wget \
         curl \
         vim \
         net-tools \
         tzdata \
-    && docker-image-cleanup
-
-RUN set -x \
-    # Install services
-    && apt-install \
-        # Install common tools
         zip \
         unzip \
         bzip2 \
