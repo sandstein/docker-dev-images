@@ -138,7 +138,7 @@ php)
           docker-compose build "${BUILD_ARGS}" "php-${type}-${version}"
           ;;
       esac
-      tag_php_version "php ""$type" "7.4" "7.4 $(get_php_version "$type" 7.3)"
+      tag_php_version "php ""$type" "7.4" "7.4 $(get_php_version "$type" 7.4)"
       ;;
     8.0)
       case $type in
@@ -149,7 +149,7 @@ php)
           docker-compose build "${BUILD_ARGS}" "php-${type}-${version}"
           ;;
       esac
-      tag_php_version "php" "$type" "8.0" "8.0 $(get_php_version "$type" 7.3)"
+      tag_php_version "php" "$type" "8.0" "8.0 $(get_php_version "$type" 8.0)"
       ;;
     8.1)
       case $type in
@@ -160,7 +160,7 @@ php)
           docker-compose build "${BUILD_ARGS}" "php-${type}-${version}"
           ;;
       esac
-      tag_php_version "php" "$type" "8.1" "8.1 $(get_php_version "$type" 7.3)"
+      tag_php_version "php" "$type" "8.1" "8.1 $(get_php_version "$type" 8.1)"
       ;;
   esac
 ;;
