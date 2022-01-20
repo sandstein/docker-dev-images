@@ -10,7 +10,7 @@ build-apache:
     - bin/build.sh apache
   only:
     - /^master$/
-    - tags
+    - /^feature/
   tags:
     - shell
 
@@ -22,7 +22,7 @@ build-mariadb:
     - bin/build.sh mariadb
   only:
     - /^master$/
-    - tags
+    - /^feature/
   tags:
     - shell
 
@@ -34,7 +34,7 @@ build-mysql:
     - bin/build.sh mysql
   only:
     - /^master$/
-    - tags
+    - /^feature/
   tags:
     - shell
 
@@ -46,7 +46,7 @@ build-percona:
     - bin/build.sh percona
   only:
     - /^master$/
-    - tags
+    - /^feature/
   tags:
     - shell
 
@@ -57,7 +57,7 @@ build-php-cli-7.3:
     - bin/build.sh php cli 7.3
   only:
     - /^master$/
-    - tags
+    - /^feature/
   tags:
     - shell
 
@@ -67,7 +67,7 @@ build-php-fpm-7.3:
     - bin/build.sh php fpm 7.3
   only:
     - /^master$/
-    - tags
+    - /^feature/
   tags:
     - shell
 
@@ -77,7 +77,7 @@ build-php-cli-7.4:
     - bin/build.sh php cli 7.4
   only:
     - /^master$/
-    - tags
+    - /^feature/
   tags:
     - shell
 
@@ -87,7 +87,7 @@ build-php-fpm-7.4:
     - bin/build.sh php fpm 7.4
   only:
     - /^master$/
-    - tags
+    - /^feature/
   tags:
     - shell
 
@@ -97,7 +97,7 @@ build-php-cli-8.0:
     - bin/build.sh php cli 8.0
   only:
     - /^master$/
-    - tags
+    - /^feature/
   tags:
     - shell
 
@@ -107,7 +107,7 @@ build-php-fpm-8.0:
     - bin/build.sh php fpm 8.0
   only:
     - /^master$/
-    - tags
+    - /^feature/
   tags:
     - shell
 
@@ -117,7 +117,7 @@ build-php-cli-8.1:
     - bin/build.sh php cli 8.1
   only:
     - /^master$/
-    - tags
+    - /^feature/
   tags:
     - shell
 
@@ -127,7 +127,7 @@ build-php-fpm-8.1:
     - bin/build.sh php fpm 8.1
   only:
     - /^master$/
-    - tags
+    - /^feature/
   tags:
     - shell
 
@@ -138,7 +138,7 @@ build-selenium-side-runner:
     - bin/build.sh selenium-side-runner
   only:
     - /^master$/
-    - tags
+    - /^feature/
   tags:
     - shell
 
@@ -149,7 +149,7 @@ build-ssh:
     - bin/build.sh ssh
   only:
     - /^master$/
-    - tags
+    - /^feature/
   tags:
     - shell
 
@@ -162,7 +162,7 @@ push-apache:
   tags:
     - shell
   only:
-    - tags
+    - /^master$/
 
 # push mariadb
 push-mariadb:
@@ -172,7 +172,7 @@ push-mariadb:
   tags:
     - shell
   only:
-    - tags
+    - /^master$/
 
 # push mysql
 push-mysql:
@@ -182,7 +182,7 @@ push-mysql:
   tags:
     - shell
   only:
-    - tags
+    - /^master$/
 
 # push percona
 push-percona:
@@ -192,7 +192,7 @@ push-percona:
   tags:
     - shell
   only:
-    - tags
+    - /^master$/
 
 # push php
 push-php:
@@ -202,7 +202,7 @@ push-php:
   tags:
     - shell
   only:
-    - tags
+    - /^master$/
 
 # push selenium-side-runner
 push-selenium-side-runner:
@@ -212,7 +212,7 @@ push-selenium-side-runner:
   tags:
     - shell
   only:
-    - tags
+    - /^master$/
 
 # push ssh
 push-ssh:
@@ -222,4 +222,4 @@ push-ssh:
   tags:
     - shell
   only:
-    - tags
+    - /^master$/
