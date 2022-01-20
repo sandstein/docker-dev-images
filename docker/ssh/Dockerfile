@@ -9,21 +9,12 @@ RUN useradd -m -s /bin/bash ssh && passwd -l ssh
 
 RUN set -x \
     && apt-update \
-    # Enable non-free
-    && apt-update \
-    # System update
-    && /usr/local/bin/apt-upgrade \
-    # Base stuff
     && apt-install \
         apt-transport-https \
         ca-certificates \
         locales \
         gnupg \
-        procps
-
-RUN set -x \
-    # Install packages and common tools
-    && apt-install \
+        procps \
         wget \
         curl \
         vim \

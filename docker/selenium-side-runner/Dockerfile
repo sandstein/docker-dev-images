@@ -39,7 +39,3 @@ RUN set -x \
     && docker-image-cleanup
 
 RUN npm install -g selenium-side-runner
-
-#
-# use node as user
-#
