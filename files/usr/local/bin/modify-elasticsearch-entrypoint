@@ -1,0 +1,11 @@
+#!/bin/bash
+
+
+set -o nounset   ## set -u : exit the script if you try to use an uninitialised variable
+set -o errexit   ## set -e : exit the script if any statement returns a non-true return value
+
+chown -R elasticsearch:elasticsearch /usr/share/elasticsearch
+chown elasticsearch:elasticsearch /usr/local/bin/docker-entrypoint.sh
+sed -i "s/--userspec=1000/--userspec=elasticsearch/g" /usr/local/bin/docker-entrypoint.sh
+sed -i "s/UID 1000/user elasticsearch/g" /usr/local/bin/docker-entrypoint.sh
+sed -i "s/chown -R 1000:0/chown -R elasticsearch:elasticsearch/g"  /usr/local/bin/docker-entrypoint.sh
