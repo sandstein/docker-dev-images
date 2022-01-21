@@ -1,4 +1,4 @@
-FROM node:lts-bullseye-slim
+FROM node:14-bullseye-slim
 
 COPY files/usr/local/bin /usr/local/bin
 
