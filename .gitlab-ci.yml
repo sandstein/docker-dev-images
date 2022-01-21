@@ -14,6 +14,16 @@ build-apache:
   tags:
     - shell
 
+# build elasticsearch
+build-elasticsearch:
+  stage: build
+  script:
+    - bin/build.sh elasticsearch
+  only:
+    - /^master$/
+    - /^feature/
+  tags:
+    - shell
 
 # build mariadb
 build-mariadb:
@@ -159,6 +169,16 @@ push-apache:
   stage: push
   script:
     - bin/push.sh apache
+  tags:
+    - shell
+  only:
+    - /^master$/
+
+# push elasticsearch
+push-elasticsearch:
+  stage: push
+  script:
+    - bin/push.sh elasticsearch
   tags:
     - shell
   only:
