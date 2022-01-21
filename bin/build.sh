@@ -122,6 +122,20 @@ php)
   tag_php_version $type $version "$version $(get_php_version "$type" $version)"
 ;;
 
+elasticsearch)
+for version in 5.6 6.4 6.8 7.1 7.3 7.10 7.16
+do
+  docker-compose build ${BUILD_ARGS} elasticsearch-${version}
+done
+tag_version "elasticsearch" "5.6" "5 5.6 5.6.16"
+tag_version "elasticsearch" "6.4" "6.4 6.4.3"
+tag_version "elasticsearch" "6.8" "6 6.8 6.8.23"
+tag_version "elasticsearch" "7.1" "7.1 7.1.1"
+tag_version "elasticsearch" "7.3" "7.3 7.3.2"
+tag_version "elasticsearch" "7.10" "7.10 7.10.1"
+tag_version "elasticsearch" "7.16" "7 7.16 7.16.3"
+;;
+
 *)
   test
 esac

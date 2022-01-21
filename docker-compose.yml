@@ -207,3 +207,45 @@ services:
       context: .
       dockerfile: docker/selenium-side-runner/Dockerfile
     tty: true
+
+  elasticsearch-5.6:
+    container_name: elasticsearch-5.6
+    build:
+      context: .
+      dockerfile: docker/elasticsearch/5.6/Dockerfile
+
+  elasticsearch-6.4:
+    container_name: elasticsearch-6.4
+    build:
+      context: .
+      dockerfile: docker/elasticsearch/6.4/Dockerfile
+
+  elasticsearch-6.8:
+    container_name: elasticsearch-6.8
+    build:
+      context: .
+      dockerfile: docker/elasticsearch/6.8/Dockerfile
+
+  elasticsearch-7.1:
+    container_name: elasticsearch-7.1
+    build:
+      context: .
+      dockerfile: docker/elasticsearch/7.1/Dockerfile
+
+  elasticsearch-7.3:
+    container_name: elasticsearch-7.3
+    build:
+      context: .
+      dockerfile: docker/elasticsearch/7.3/Dockerfile
+
+  elasticsearch-7.10:
+    container_name: elasticsearch-7.10
+    build:
+      context: .
+      dockerfile: docker/elasticsearch/7.10/Dockerfile
+
+  elasticsearch-7.16:
+    container_name: elasticsearch-7.16
+    build:
+      context: .
+      dockerfile: docker/elasticsearch/7.16/Dockerfile
