@@ -69,7 +69,7 @@ tag "ssh" "11 bullseye latest"
 selenium-side-runner)
 # selenium-side-runner (https://hub.docker.com/_/node)
 docker-compose build ${BUILD_ARGS} selenium-side-runner
-tag selenium-side-runner "$(get_selenium_side_runner_version) latest"
+tag selenium-side-runner "$(get_selenium_side_runner_version) 14"
 ;;
 
 apache)
