@@ -3,6 +3,9 @@ stages:
   - build
   - push
 
+before_script:
+  - docker-compose pull
+
 # build apache
 build-apache:
   stage: build
