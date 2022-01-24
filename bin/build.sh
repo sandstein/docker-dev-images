@@ -123,7 +123,7 @@ php)
 ;;
 
 elasticsearch)
-for version in 5.6 6.4 6.8 7.1 7.3 7.10 7.16
+for version in 5.6 6.4 6.8 7.1 7.3 7.6 7.10 7.16
 do
   docker-compose build ${BUILD_ARGS} elasticsearch-${version}
 done
