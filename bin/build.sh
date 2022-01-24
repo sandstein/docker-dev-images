@@ -132,6 +132,7 @@ tag_version "elasticsearch" "6.4" "6.4 6.4.3"
 tag_version "elasticsearch" "6.8" "6 6.8 6.8.23"
 tag_version "elasticsearch" "7.1" "7.1 7.1.1"
 tag_version "elasticsearch" "7.3" "7.3 7.3.2"
+tag_version "elasticsearch" "7.6" "7.6 7.6.2"
 tag_version "elasticsearch" "7.10" "7.10 7.10.1"
 tag_version "elasticsearch" "7.16" "7 7.16 7.16.3"
 ;;

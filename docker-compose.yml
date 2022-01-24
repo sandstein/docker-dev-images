@@ -238,6 +238,12 @@ services:
       context: .
       dockerfile: docker/elasticsearch/7.3/Dockerfile
 
+  elasticsearch-7.6:
+    container_name: elasticsearch-7.6
+    build:
+      context: .
+      dockerfile: docker/elasticsearch/7.3/Dockerfile
+
   elasticsearch-7.10:
     container_name: elasticsearch-7.10
     build:
