@@ -65,7 +65,7 @@ RUN set -x \
       redis \
       shmop \
       soap \
-#      sockets \
+      sockets \
       solr \
       sysvmsg \
       sysvsem \

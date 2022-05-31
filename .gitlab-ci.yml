@@ -166,6 +166,15 @@ build-ssh:
   tags:
     - shell
 
+build-node:
+  stage: build
+  script:
+    - bin/build.sh node
+  only:
+    - /^master$/
+    - /^feature$/
+  tags:
+    - shell
 
 # push apache
 push-apache:
@@ -242,6 +251,16 @@ push-ssh:
   stage: push
   script:
     - bin/push.sh ssh
+  tags:
+    - shell
+  only:
+    - /^master$/
+
+# push ssh
+push-node:
+  stage: push
+  script:
+    - bin/push.sh node
   tags:
     - shell
   only:
