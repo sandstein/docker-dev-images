@@ -255,3 +255,21 @@ services:
     build:
       context: .
       dockerfile: docker/elasticsearch/7.16/Dockerfile
+
+  node-16:
+    container_name: node-16
+    build:
+      context: .
+      dockerfile: docker/node/16/Dockerfile
+
+  node-17:
+    container_name: node-17
+    build:
+      context: .
+      dockerfile: docker/node/17/Dockerfile
+
+  node-18:
+    container_name: node-18
+    build:
+      context: .
+      dockerfile: docker/node/18/Dockerfile

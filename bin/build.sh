@@ -30,6 +30,10 @@ get_php_version()  {
   docker-compose run --rm "php-$1-$2" php --version | grep "^PHP" | cut -d " " -f2
 }
 
+get_node_version() {
+  docker-compose run --rm node-$1 node -v| grep "^v" | sed "s/v//"
+}
+
 get_mysql_version() {
   docker-compose run --rm "mysql-$1" mysqld --version | cut -d " " -f4
 }
@@ -135,6 +139,14 @@ tag_version "elasticsearch" "7.3" "7.3 7.3.2"
 tag_version "elasticsearch" "7.6" "7.6 7.6.2"
 tag_version "elasticsearch" "7.10" "7.10 7.10.1"
 tag_version "elasticsearch" "7.16" "7 7.16 7.16.3"
+;;
+
+node)
+for version in 16 17 18
+do
+  docker-compose build ${BUILD_ARGS} node-${version}
+  tag_version "node" $version "$(get_node_version "$version")"
+done
 ;;
 
 *)
