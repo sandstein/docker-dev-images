@@ -3,8 +3,8 @@ FROM php:8.1-fpm
 COPY files/usr/local/bin /usr/local/bin
 
 RUN set -x \
-    && apt-update \
-    && apt-install \
+    && apt-update > /dev/null \
+    && apt-install  > /dev/null\
         apt-transport-https \
         ca-certificates \
         locales \
@@ -23,9 +23,9 @@ RUN set -x \
         openssh-client \
         rsync \
         git \
-        patch \
-    && /usr/local/bin/generate-locales \
-    && docker-image-cleanup
+        patch  > /dev/null\
+    && /usr/local/bin/generate-locales  > /dev/null\
+    && docker-image-cleanup > /dev/null
 
 ADD https://github.com/mlocati/docker-php-extension-installer/releases/latest/download/install-php-extensions /usr/local/bin/
 
@@ -66,7 +66,6 @@ RUN set -x \
       shmop \
       soap \
       sockets \
-      solr \
       sysvmsg \
       sysvsem \
       sysvshm \
@@ -78,5 +77,5 @@ RUN set -x \
       xmlrpc \
       xsl \
       zip \
-      zstd \
-    && docker-image-cleanup
+      zstd  > /dev/null \
+    && docker-image-cleanup  > /dev/null
