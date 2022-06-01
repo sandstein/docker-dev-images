@@ -25,9 +25,9 @@ RUN set -x \
         git \
         patch \
         # add mysqlclient to be able to access mysql from cli
-        mariadb-client \
-    && /usr/local/bin/generate-locales \
-    && docker-image-cleanup
+        mariadb-client > /dev/null \
+    && /usr/local/bin/generate-locales > /dev/null \
+    && docker-image-cleanup > /dev/null
 
 ADD https://github.com/mlocati/docker-php-extension-installer/releases/latest/download/install-php-extensions /usr/local/bin/
 
@@ -83,8 +83,8 @@ RUN set -x \
       xmlrpc \
       xsl \
       zip \
-      zstd \
-    && docker-image-cleanup
+      zstd > /dev/null \
+    && docker-image-cleanup > /dev/null
 
 RUN groupadd -g 1000 phpcli && \
     useradd -u 1000 -g 1000 -m -s /bin/bash phpcli

@@ -2,6 +2,7 @@ FROM debian:bullseye-slim
 
 COPY files/usr/local/bin /usr/local/bin
 
+COPY files/commands/ssh-cmd.sh  /usr/local/bin/
 #
 # Adds interactive user snm
 #
@@ -31,3 +32,5 @@ RUN set -x \
         patch \
     && /usr/local/bin/generate-locales \
     && docker-image-cleanup
+
+CMD ["ssh-cmd.sh"]
