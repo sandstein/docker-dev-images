@@ -34,6 +34,11 @@ get_node_version() {
   docker-compose run --rm node-$1 node -v| grep "^v" | sed "s/v//"
 }
 
+
+get_python_version() {
+  docker-compose run --rm python-$1 python -V| grep "^Python " | sed "s/Python //" | sed 's/\r//'
+}
+
 get_mysql_version() {
   docker-compose run --rm "mysql-$1" mysqld --version | cut -d " " -f4
 }
@@ -145,7 +150,15 @@ node)
 for version in 16 17 18
 do
   docker-compose build ${BUILD_ARGS} node-${version}
-  tag_version "node" $version "$(get_node_version "$version")"
+  tag_version "node" $version "$version $(get_node_version "$version")"
+done
+;;
+
+python)
+for version in 3.10
+do
+  docker-compose build ${BUILD_ARGS} python-${version}
+  tag_version "python" $version "$version $(get_python_version "$version") latest"
 done
 ;;
 

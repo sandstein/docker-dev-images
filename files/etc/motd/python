@@ -1,0 +1,6 @@
+When working with python remember to create venv!
+
+$ python3 -m venv <yourenv>
+$ source <yourenv>/bin/activate
+(<yourenv>) $ deactivate
+$
