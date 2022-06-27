@@ -274,6 +274,12 @@ services:
       context: .
       dockerfile: docker/node/18/Dockerfile
 
+  python-3.10:
+    container_name: python-3.10
+    build:
+      context: .
+      dockerfile: docker/python/3.10/Dockerfile
+
   solr-7.7:
     container_name: solr-7.7
     build:
