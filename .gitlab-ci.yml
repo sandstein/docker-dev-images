@@ -176,6 +176,17 @@ build-node:
   tags:
     - shell
 
+# build solr
+build-solr:
+  stage: build
+  script:
+    - bin/build.sh solr
+  only:
+    - /^master$/
+    - /^feature$/
+  tags:
+    - shell
+
 # push apache
 push-apache:
   stage: push
@@ -256,11 +267,21 @@ push-ssh:
   only:
     - /^master$/
 
-# push ssh
+# push node
 push-node:
   stage: push
   script:
     - bin/push.sh node
+  tags:
+    - shell
+  only:
+    - /^master$/
+
+# push solr
+push-solr:
+  stage: push
+  script:
+    - bin/push.sh solr
   tags:
     - shell
   only:

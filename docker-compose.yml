@@ -279,3 +279,16 @@ services:
     build:
       context: .
       dockerfile: docker/python/3.10/Dockerfile
+
+  solr-7.7:
+    container_name: solr-7.7
+    build:
+      context: .
+      dockerfile: docker/solr/7.7/Dockerfile
+
+  solr-8.9:
+    container_name: solr-8.9
+    build:
+      context: .
+      dockerfile: docker/solr/8.9/Dockerfile
+

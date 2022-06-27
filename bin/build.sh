@@ -162,6 +162,15 @@ do
 done
 ;;
 
+solr)
+for version in 7.7 8.9
+do
+  docker-compose build ${BUILD_ARGS} solr-${version}
+done
+tag_version "solr" "7.7" "7.7 7.7.3"
+tag_version "solr" "8.9" "8.9 8.9.0 latest"
+;;
+
 *)
   test
 esac
