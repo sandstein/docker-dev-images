@@ -1,4 +1,4 @@
-FROM node:17-slim
+FROM node:17-bullseye
 
 COPY files/usr/local/bin /usr/local/bin
 
@@ -24,5 +24,8 @@ RUN set -x \
         rsync \
         git \
         patch \
+        build-essential \
     && /usr/local/bin/generate-locales \
     && docker-image-cleanup
+
+RUN npm install -g node-build-tools

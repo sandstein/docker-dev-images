@@ -147,7 +147,7 @@ tag_version "elasticsearch" "7.16" "7 7.16 7.16.3"
 ;;
 
 node)
-for version in 16 17 18
+for version in 11 12 14 16 17 18
 do
   docker-compose build ${BUILD_ARGS} node-${version}
   tag_version "node" $version "$version $(get_node_version "$version")"
