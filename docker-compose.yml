@@ -255,6 +255,23 @@ services:
     build:
       context: .
       dockerfile: docker/elasticsearch/7.16/Dockerfile
+  node-11:
+    container_name: node-11
+    build:
+      context: .
+      dockerfile: docker/node/11/Dockerfile
+
+  node-12:
+    container_name: node-12
+    build:
+      context: .
+      dockerfile: docker/node/16/Dockerfile
+
+  node-14:
+    container_name: node-14
+    build:
+      context: .
+      dockerfile: docker/node/16/Dockerfile
 
   node-16:
     container_name: node-16

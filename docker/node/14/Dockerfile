@@ -1,4 +1,4 @@
-FROM node:18-bullseye
+FROM node:14-bullseye
 
 COPY files/usr/local/bin /usr/local/bin
 

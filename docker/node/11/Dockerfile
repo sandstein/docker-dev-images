@@ -1,4 +1,4 @@
-FROM node:18-bullseye
+FROM node:11-stretch
 
 COPY files/usr/local/bin /usr/local/bin
 
@@ -25,6 +25,7 @@ RUN set -x \
         git \
         patch \
         build-essential \
+        python \
     && /usr/local/bin/generate-locales \
     && docker-image-cleanup
 
