@@ -24,5 +24,13 @@ RUN set -x \
         rsync \
         git \
         patch \
+        build-essential \
     && /usr/local/bin/generate-locales \
     && docker-image-cleanup
+
+RUN cd /tmp && \
+    git clone https://github.com/devilbox/cert-gen.git && \
+    cd cert-gen && \
+    make install && \
+    cd .. && \
+    rm -rf cert-gen
