@@ -1,4 +1,4 @@
-FROM mysql:5.7
+FROM mysql:5.7-debian
 
 COPY files/usr/local/bin /usr/local/bin
 
