@@ -1,4 +1,4 @@
-FROM mysql:8.0
+FROM mysql:8.0-debian
 
 COPY files/usr/local/bin /usr/local/bin
 
