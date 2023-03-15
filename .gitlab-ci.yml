@@ -147,7 +147,7 @@ build-php-fpm-8.1:
 build-php-cli-8.2:
   stage: build
   script:
-    - bin/build.sh php cli 8.1
+    - bin/build.sh php cli 8.2 latest
   only:
     - /^master$/
     - /^feature/
@@ -157,7 +157,7 @@ build-php-cli-8.2:
 build-php-fpm-8.2:
   stage: build
   script:
-    - bin/build.sh php fpm 8.1
+    - bin/build.sh php fpm 8.2
   only:
     - /^master$/
     - /^feature/
