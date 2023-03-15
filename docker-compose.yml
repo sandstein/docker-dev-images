@@ -72,6 +72,22 @@ services:
       dockerfile: docker/php-cli/8.1/Dockerfile
     tty: true
 
+#
+# latest php 8.2
+#
+  php-fpm-8.2:
+    container_name: php-fpm-8.2
+    build:
+      context: .
+      dockerfile: docker/php-fpm/8.2/Dockerfile
+
+  php-cli-8.2:
+    container_name: php-cli-8.2
+    build:
+      context: .
+      dockerfile: docker/php-cli/8.2/Dockerfile
+    tty: true
+
   #
   # mysql 5.5.62
   #
@@ -193,7 +209,7 @@ services:
       context: .
       dockerfile: docker/mariadb/10.7/Dockerfile
   #
-  # apache 2.4.39
+  # apache 2.4.x
   #
   apache-2.4:
     container_name: apache-2.4
@@ -255,6 +271,19 @@ services:
     build:
       context: .
       dockerfile: docker/elasticsearch/7.16/Dockerfile
+
+  elasticsearch-7.17:
+    container_name: elasticsearch-7.17
+    build:
+      context: .
+      dockerfile: docker/elasticsearch/7.16/Dockerfile
+
+  elasticsearch-8.6:
+    container_name: elasticsearch-8.6
+    build:
+      context: .
+      dockerfile: docker/elasticsearch/8.6/Dockerfile
+
   node-11:
     container_name: node-11
     build:

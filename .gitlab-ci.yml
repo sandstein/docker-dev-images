@@ -144,6 +144,26 @@ build-php-fpm-8.1:
   tags:
     - shell
 
+build-php-cli-8.2:
+  stage: build
+  script:
+    - bin/build.sh php cli 8.1
+  only:
+    - /^master$/
+    - /^feature/
+  tags:
+    - shell
+
+build-php-fpm-8.2:
+  stage: build
+  script:
+    - bin/build.sh php fpm 8.1
+  only:
+    - /^master$/
+    - /^feature/
+  tags:
+    - shell
+
 # build selenium-side-runner
 build-selenium-side-runner:
   stage: build

@@ -132,7 +132,7 @@ php)
 ;;
 
 elasticsearch)
-for version in 5.6 6.4 6.8 7.1 7.3 7.6 7.10 7.16
+for version in 5.6 6.4 6.8 7.1 7.3 7.6 7.10 7.16 7.17 8.6
 do
   docker-compose build ${BUILD_ARGS} elasticsearch-${version}
 done
@@ -143,7 +143,9 @@ tag_version "elasticsearch" "7.1" "7.1 7.1.1"
 tag_version "elasticsearch" "7.3" "7.3 7.3.2"
 tag_version "elasticsearch" "7.6" "7.6 7.6.2"
 tag_version "elasticsearch" "7.10" "7.10 7.10.1"
-tag_version "elasticsearch" "7.16" "7 7.16 7.16.3"
+tag_version "elasticsearch" "7.16" "7.16 7.16.3"
+tag_version "elasticsearch" "7.17" "7 7.17 7.17.8"
+tag_version "elasticsearch" "8.6" "8 8.6 8.6.2 latest"
 ;;
 
 node)
