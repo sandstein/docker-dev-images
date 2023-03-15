@@ -78,7 +78,7 @@ tag "ssh" "11 bullseye latest"
 selenium-side-runner)
 # selenium-side-runner (https://hub.docker.com/_/node)
 docker-compose build ${BUILD_ARGS} selenium-side-runner
-tag selenium-side-runner "$(get_selenium_side_runner_version) 14"
+tag selenium-side-runner "$(get_selenium_side_runner_version) 14 lastest"
 ;;
 
 apache)
@@ -97,8 +97,8 @@ tag_version "mariadb" "10.2" "10.2 $(get_mariadb_version 10.2)"
 tag_version "mariadb" "10.3" "10.3 $(get_mariadb_version 10.3)"
 tag_version "mariadb" "10.4" "10.4 $(get_mariadb_version 10.4)"
 tag_version "mariadb" "10.5" "10.5 $(get_mariadb_version 10.5)"
-tag_version "mariadb" "10.6" "10.6 $(get_mariadb_version 10.6) latest"
-tag_version "mariadb" "10.7" "10.7 $(get_mariadb_version 10.7)"
+tag_version "mariadb" "10.6" "10.6 $(get_mariadb_version 10.6)"
+tag_version "mariadb" "10.7" "10.7 $(get_mariadb_version 10.7) latest"
 ;;
 
 mysql)
@@ -127,8 +127,13 @@ php)
   type=$2
   version=$3
   target="php-$type-$version"
-  docker-compose build ${BUILD_ARGS} $target
-  tag_php_version $type $version "$version $(get_php_version "$type" $version)"
+  #docker-compose build ${BUILD_ARGS} $target
+  if [ "$#" -eq 4 ]; then
+    tag_php_version $type $version "$version $(get_php_version "$type" $version)"
+    tag_version "php" "$type-$version" "$4"
+  else
+    tag_php_version $type $version "$version $(get_php_version "$type" $version)"
+  fi
 ;;
 
 elasticsearch)
@@ -152,7 +157,7 @@ node)
 for version in 11 12 14 16 17 18
 do
   docker-compose build ${BUILD_ARGS} node-${version}
-  tag_version "node" $version "$version $(get_node_version "$version")"
+  tag_version "node" $version "$version $(get_node_version "$version") lastest"
 done
 ;;
 
