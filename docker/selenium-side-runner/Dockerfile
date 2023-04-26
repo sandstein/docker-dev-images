@@ -1,5 +1,7 @@
 FROM node:14-bullseye-slim
 
+LABEL de.sandstein.dde="selenium-side-runner"
+
 COPY files/usr/local/bin /usr/local/bin
 
 RUN set -x \

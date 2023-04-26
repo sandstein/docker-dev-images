@@ -1,5 +1,7 @@
 FROM mysql:5.6
 
+LABEL de.sandstein.dde="mysql"
+
 COPY files/usr/local/bin /usr/local/bin
 
 RUN set -x \

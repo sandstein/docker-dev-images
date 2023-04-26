@@ -1,5 +1,7 @@
 FROM node:14-bullseye
 
+LABEL de.sandstein.dde="node"
+
 COPY files/usr/local/bin /usr/local/bin
 
 RUN set -x \

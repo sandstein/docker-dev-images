@@ -1,308 +1,77 @@
 
 stages:
   - build
-  - push
+
+.build: &build
+  stage: build
+  script:
+    - 'bin/build.sh $TARGET'
+    - 'bin/push.sh $TARGET'
+    - 'bin/cleanup.sh $TARGET'
+  only:
+    - /^master$/
+  tags:
+    - shell
 
 before_script:
   - docker-compose pull
 
 # build apache
 build-apache:
-  stage: build
-  script:
-    - bin/build.sh apache
-  only:
-    - /^master$/
-    - /^feature/
-  tags:
-    - shell
+  variables:
+    TARGET: apache
+  <<: *build
 
 # build elasticsearch
 build-elasticsearch:
-  stage: build
-  script:
-    - bin/build.sh elasticsearch
-  only:
-    - /^master$/
-    - /^feature/
-  tags:
-    - shell
-
-# build mariadb
-build-mariadb:
-  stage: build
-  script:
-    - bin/build.sh mariadb
-  only:
-    - /^master$/
-    - /^feature/
-  tags:
-    - shell
-
+  variables:
+    TARGET: elasticsearch
+  <<: *build
 
 # build mysql
 build-mysql:
-  stage: build
-  script:
-    - bin/build.sh mysql
-  only:
-    - /^master$/
-    - /^feature/
-  tags:
-    - shell
-
+  variables:
+    TARGET: mysql
+  <<: *build
 
 # build percona
 build-percona:
-  stage: build
-  script:
-    - bin/build.sh percona
-  only:
-    - /^master$/
-    - /^feature/
-  tags:
-    - shell
+  variables:
+    TARGET: percona
+  <<: *build
 
 # build php
-build-php-cli-7.3:
-  stage: build
-  script:
-    - bin/build.sh php cli 7.3
-  only:
-    - /^master$/
-    - /^feature/
-  tags:
-    - shell
+build-php:
+  variables:
+    TARGET: php
+  <<: *build
 
-build-php-fpm-7.3:
-  stage: build
-  script:
-    - bin/build.sh php fpm 7.3
-  only:
-    - /^master$/
-    - /^feature/
-  tags:
-    - shell
-
-build-php-cli-7.4:
-  stage: build
-  script:
-    - bin/build.sh php cli 7.4
-  only:
-    - /^master$/
-    - /^feature/
-  tags:
-    - shell
-
-build-php-fpm-7.4:
-  stage: build
-  script:
-    - bin/build.sh php fpm 7.4
-  only:
-    - /^master$/
-    - /^feature/
-  tags:
-    - shell
-
-build-php-cli-8.0:
-  stage: build
-  script:
-    - bin/build.sh php cli 8.0
-  only:
-    - /^master$/
-    - /^feature/
-  tags:
-    - shell
-
-build-php-fpm-8.0:
-  stage: build
-  script:
-    - bin/build.sh php fpm 8.0
-  only:
-    - /^master$/
-    - /^feature/
-  tags:
-    - shell
-
-build-php-cli-8.1:
-  stage: build
-  script:
-    - bin/build.sh php cli 8.1
-  only:
-    - /^master$/
-    - /^feature/
-  tags:
-    - shell
-
-build-php-fpm-8.1:
-  stage: build
-  script:
-    - bin/build.sh php fpm 8.1
-  only:
-    - /^master$/
-    - /^feature/
-  tags:
-    - shell
-
-build-php-cli-8.2:
-  stage: build
-  script:
-    - bin/build.sh php cli 8.2 latest
-  only:
-    - /^master$/
-    - /^feature/
-  tags:
-    - shell
-
-build-php-fpm-8.2:
-  stage: build
-  script:
-    - bin/build.sh php fpm 8.2
-  only:
-    - /^master$/
-    - /^feature/
-  tags:
-    - shell
+# build python
+build-python:
+  variables:
+    TARGET: python
+  <<: *build
 
 # build selenium-side-runner
 build-selenium-side-runner:
-  stage: build
-  script:
-    - bin/build.sh selenium-side-runner
-  only:
-    - /^master$/
-    - /^feature/
-  tags:
-    - shell
-
-# build ssh
-build-ssh:
-  stage: build
-  script:
-    - bin/build.sh ssh
-  only:
-    - /^master$/
-    - /^feature/
-  tags:
-    - shell
-
-build-node:
-  stage: build
-  script:
-    - bin/build.sh node
-  only:
-    - /^master$/
-    - /^feature$/
-  tags:
-    - shell
+  variables:
+    TARGET: selenium-side-runner
+  <<: *build
 
 # build solr
 build-solr:
-  stage: build
-  script:
-    - bin/build.sh solr
-  only:
-    - /^master$/
-    - /^feature$/
-  tags:
-    - shell
+  variables:
+    TARGET: solr
+  <<: *build
 
-# push apache
-push-apache:
-  stage: push
-  script:
-    - bin/push.sh apache
-  tags:
-    - shell
-  only:
-    - /^master$/
+# build ssh
+build-ssh:
+  variables:
+    TARGET: ssh
+  <<: *build
 
-# push elasticsearch
-push-elasticsearch:
-  stage: push
-  script:
-    - bin/push.sh elasticsearch
-  tags:
-    - shell
-  only:
-    - /^master$/
-
-# push mariadb
-push-mariadb:
-  stage: push
-  script:
-    - bin/push.sh mariadb
-  tags:
-    - shell
-  only:
-    - /^master$/
-
-# push mysql
-push-mysql:
-  stage: push
-  script:
-    - bin/push.sh mysql
-  tags:
-    - shell
-  only:
-    - /^master$/
-
-# push percona
-push-percona:
-  stage: push
-  script:
-    - bin/push.sh percona
-  tags:
-    - shell
-  only:
-    - /^master$/
-
-# push php
-push-php:
-  stage: push
-  script:
-    - bin/push.sh php
-  tags:
-    - shell
-  only:
-    - /^master$/
-
-# push selenium-side-runner
-push-selenium-side-runner:
-  stage: push
-  script:
-    - bin/push.sh selenium-side-runner
-  tags:
-    - shell
-  only:
-    - /^master$/
-
-# push ssh
-push-ssh:
-  stage: push
-  script:
-    - bin/push.sh ssh
-  tags:
-    - shell
-  only:
-    - /^master$/
-
-# push node
-push-node:
-  stage: push
-  script:
-    - bin/push.sh node
-  tags:
-    - shell
-  only:
-    - /^master$/
-
-# push solr
-push-solr:
-  stage: push
-  script:
-    - bin/push.sh solr
-  tags:
-    - shell
-  only:
-    - /^master$/
+# build node
+build-node:
+  variables:
+    TARGET: node
+  <<: *build
