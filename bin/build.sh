@@ -78,7 +78,7 @@ tag "ssh" "11 bullseye latest"
 selenium-side-runner)
 # selenium-side-runner (https://hub.docker.com/_/node)
 docker-compose build ${BUILD_ARGS} selenium-side-runner
-tag selenium-side-runner "$(get_selenium_side_runner_version) 14 lastest"
+tag selenium-side-runner "$(get_selenium_side_runner_version) 14 latest"
 ;;
 
 apache)
@@ -124,18 +124,19 @@ tag_version "percona" "8.0" "8.0 $(get_percona_version 5.7) latest"
 
 php)
 # php (cli and fpm) (https://hub.docker.com/_/php/)
-  type=$2
-  version=$3
-  target="php-$type-$version"
-  #docker-compose build ${BUILD_ARGS} $target
-  if [ "$#" -eq 4 ]; then
+for type in cli fpm
+  do
+  for version in 7.3 7.4 8.0 8.1 8.2
+  do
+    target="php-$type-$version"
+    docker-compose build ${BUILD_ARGS} $target
     tag_php_version $type $version "$version $(get_php_version "$type" $version)"
-    tag_version "php" "$type-$version" "$4"
-  else
-    tag_php_version $type $version "$version $(get_php_version "$type" $version)"
-  fi
+    if [ "${type}" == "cli" ] && [ "${version}" == "8.2" ]; then
+      tag_version "php" "$type-$version" "latest"
+    fi
+  done
+done
 ;;
-
 elasticsearch)
 for version in 5.6 6.4 6.8 7.1 7.3 7.6 7.10 7.16 7.17 8.6
 do
@@ -157,7 +158,11 @@ node)
 for version in 11 12 14 16 17 18
 do
   docker-compose build ${BUILD_ARGS} node-${version}
-  tag_version "node" $version "$version $(get_node_version "$version") lastest"
+  if [ ${version} == "18" ]; then
+    tag_version "node" $version "$version $(get_node_version "$version") latest"
+  else
+    tag_version "node" $version "$version $(get_node_version "$version")"
+  fi
 done
 ;;
 

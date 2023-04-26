@@ -5,6 +5,9 @@ FROM openjdk:11-jre
 LABEL maintainer="The Apache Lucene/Solr Project"
 LABEL repository="https://github.com/docker-solr/docker-solr"
 
+LABEL de.sandstein.dde="php"
+
+
 ARG SOLR_VERSION="8.9.0"
 ARG SOLR_SHA512="15150b7f191fd9e8d2c1bd8bb619dd4b3f27af2e0e94b7609031f7e745a2e263391c30f68865c208afb97ccaa9bde6d16050200e9bfccef65f762c2ed743c242"
 ARG SOLR_KEYS="9722F25F650057E26C803B60A6D064D833B3A969"

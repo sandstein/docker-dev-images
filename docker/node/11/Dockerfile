@@ -1,5 +1,7 @@
 FROM node:11-stretch
 
+LABEL de.sandstein.dde="node"
+
 COPY files/usr/local/bin /usr/local/bin
 
 RUN set -x \

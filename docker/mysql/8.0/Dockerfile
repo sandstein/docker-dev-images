@@ -1,5 +1,7 @@
 FROM mysql:8.0-debian
 
+LABEL de.sandstein.dde="mysql"
+
 COPY files/usr/local/bin /usr/local/bin
 
 RUN set -ex; \
