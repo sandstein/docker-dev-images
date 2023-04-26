@@ -13,6 +13,17 @@ stages:
   tags:
     - shell
 
+.build-php: &build-php
+  stage: build
+  script:
+    - 'bin/build.sh php $TYPE $VERSION'
+    - 'bin/push.sh php'
+    - 'bin/cleanup.sh php'
+  only:
+    - /^master$/
+  tags:
+    - shell
+
 before_script:
   - docker-compose pull
 
@@ -41,10 +52,64 @@ build-percona:
   <<: *build
 
 # build php
-build-php:
+build-php-cli-7.3:
   variables:
-    TARGET: php
-  <<: *build
+    TYPE: cli
+    VERSION: 7.3
+  <<: *build-php
+
+build-php-cli-7.4:
+  variables:
+    TYPE: cli
+    VERSION: 7.4
+  <<: *build-php
+
+build-php-cli-8.0:
+  variables:
+    TYPE: cli
+    VERSION: 8.0
+  <<: *build-php
+
+build-php-cli-8.1:
+  variables:
+    TYPE: cli
+    VERSION: 8.1
+  <<: *build-php
+
+build-php-cli-8.2:
+  variables:
+    TYPE: cli
+    VERSION: 8.2
+  <<: *build-php
+build-php-fpm-7.3:
+  variables:
+    TYPE: fpm
+    VERSION: 7.3
+  <<: *build-php
+
+build-php-fpm-7.4:
+  variables:
+    TYPE: fpm
+    VERSION: 7.4
+  <<: *build-php
+
+build-php-fpm-8.0:
+  variables:
+    TYPE: fpm
+    VERSION: 8.0
+  <<: *build-php
+
+build-php-fpm-8.1:
+  variables:
+    TYPE: fpm
+    VERSION: 8.1
+  <<: *build-php
+
+build-php-fpm-8.2:
+  variables:
+    TYPE: fpm
+    VERSION: 8.2
+  <<: *build-php
 
 # build python
 build-python:
