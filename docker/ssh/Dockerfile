@@ -1,5 +1,7 @@
 FROM debian:bullseye-slim
 
+LABEL de.sandstein.dde="ssh"
+
 COPY files/usr/local/bin /usr/local/bin
 
 COPY files/commands/ssh-cmd.sh  /usr/local/bin/

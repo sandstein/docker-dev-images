@@ -1,5 +1,7 @@
 FROM php:7.4-fpm
 
+LABEL de.sandstein.dde="php"
+
 COPY files/usr/local/bin /usr/local/bin
 
 RUN set -x \

@@ -1,5 +1,7 @@
 FROM php:7.3-cli
 
+LABEL de.sandstein.dde="php"
+
 COPY files/usr/local/bin /usr/local/bin
 
 RUN set -x \

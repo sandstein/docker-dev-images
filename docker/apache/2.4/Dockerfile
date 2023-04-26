@@ -1,5 +1,7 @@
 FROM httpd:2.4
 
+LABEL de.sandstein.dde="apache"
+
 COPY files/usr/local/bin /usr/local/bin
 
 RUN set -x \

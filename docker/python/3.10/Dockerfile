@@ -1,5 +1,7 @@
 FROM python:3.10
 
+LABEL de.sandstein.dde="python"
+
 COPY files/usr/local/bin /usr/local/bin
 
 RUN set -x \

@@ -1,5 +1,7 @@
 FROM mariadb:10.2
 
+LABEL de.sandstein.dde="mariadb"
+
 COPY files/usr/local/bin /usr/local/bin
 
 RUN set -x \
