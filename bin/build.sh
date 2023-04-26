@@ -124,19 +124,14 @@ tag_version "percona" "8.0" "8.0 $(get_percona_version 5.7) latest"
 
 php)
 # php (cli and fpm) (https://hub.docker.com/_/php/)
-for type in cli fpm
-  do
-  for version in 7.3 7.4 8.0 8.1 8.2
-  do
-    target="php-$type-$version"
-    docker-compose build ${BUILD_ARGS} $target
-    tag_php_version $type $version "$version $(get_php_version "$type" $version)"
-    if [ "${type}" == "cli" ] && [ "${version}" == "8.2" ]; then
-      tag_version "php" "$type-$version" "latest"
-    fi
-  done
-done
+type=$2
+version=$3
+target="php-$type-$version"
+docker-compose build ${BUILD_ARGS} $target
+tag_php_version $type $version "$version $(get_php_version "$type" $version)"
+tag_version "php" "$type-$version" "latest"
 ;;
+
 elasticsearch)
 for version in 5.6 6.4 6.8 7.1 7.3 7.6 7.10 7.16 7.17 8.6
 do
