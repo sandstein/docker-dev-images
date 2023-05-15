@@ -1,4 +1,4 @@
 #!/bin/bash
 
 docker login
-docker push "sandstein/$1"
+docker push --all-tags "sandstein/$1"
