@@ -3,7 +3,6 @@ FROM php:8.2-cli
 LABEL de.sandstein.dde="php"
 
 COPY files/usr/local/bin /usr/local/bin
-COPY files/usr/local/lib/php/extensions/no-debug-non-zts-20210902/ixed.8.1.lin /usr/local/lib/php/extensions/no-debug-non-zts-20210902
 
 RUN set -x \
     && apt-update  > /dev/null\
@@ -51,6 +50,7 @@ RUN set -x \
       grpc \
       imap \
       intl \
+      ioncube_loader \
       ldap \
       lzf \
       mailparse \
@@ -71,6 +71,8 @@ RUN set -x \
       shmop \
       soap \
       sockets \
+      solr \
+      sourceguardian \
       sysvmsg \
       sysvsem \
       sysvshm \
