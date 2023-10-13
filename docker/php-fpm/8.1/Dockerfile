@@ -3,7 +3,6 @@ FROM php:8.1-fpm
 LABEL de.sandstein.dde="php"
 
 COPY files/usr/local/bin /usr/local/bin
-COPY files/usr/local/lib/php/extensions/no-debug-non-zts-20210902/ixed.8.1.lin /usr/local/lib/php/extensions/no-debug-non-zts-20210902
 
 RUN set -x \
     && apt-update > /dev/null \
