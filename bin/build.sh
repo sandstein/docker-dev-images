@@ -7,7 +7,7 @@ PROJECT_NAME=$(basename "${PWD}")
 tag() {
   for tag in $2
   do
-    docker tag "${PROJECT_NAME}_$1:latest" "sandstein/$1:$tag"
+    docker tag "${PROJECT_NAME}-$1:latest" "sandstein/$1:$tag"
   done
 
 }
@@ -15,23 +15,23 @@ tag() {
 tag_version() {
   for tag in $3
   do
-    docker tag "${PROJECT_NAME}_$1-$2:latest" "sandstein/$1:$tag"
+    docker tag "${PROJECT_NAME}-$1-$2:latest" "sandstein/$1:$tag"
   done
 }
 
 tag_php_version() {
   for tag in $3
   do
-    docker tag "${PROJECT_NAME}_php-$1-$2" "sandstein/php:$1-$tag"
+    docker tag "${PROJECT_NAME}-php-$1-$2" "sandstein/php:$1-$tag"
   done
 }
 
 get_php_version()  {
-  docker-compose run --rm "php-$1-$2" php --version | grep "^PHP" | cut -d " " -f2
+  docker compose run --rm "php-$1-$2" php --version | grep "^PHP" | cut -d " " -f2
 }
 
 get_node_version() {
-  docker-compose run --rm node-$1 node -v| grep "^v" | sed "s/v//"
+  docker compose run --rm node-$1 node -v| grep "^v" | sed "s/v//"
 }
 
 
@@ -54,7 +54,7 @@ get_mariadb_version() {
 }
 
 get_apache_version() {
-  docker-compose run --rm "apache-$1" httpd -v | \
+  docker compose run --rm "apache-$1" httpd -v | \
     grep --only-matching --perl-regexp "Apache\/\\d+\.\\d+\.\\d+" | \
     grep  --only-matching --perl-regexp "\\d+\.\\d+\.\\d+"  | sed 's/\r//'
 }
@@ -103,11 +103,10 @@ tag_version "mariadb" "10.7" "10.7 $(get_mariadb_version 10.7) latest"
 
 mysql)
 # mysql (https://hub.docker.com/_/mysql)
-for version in 5.6 5.7 8.0
+for version in 5.7 8.0
 do
   docker compose build ${BUILD_ARGS} "mysql-$version"
 done
-tag_version "mysql" "5.6" "5.6 $(get_mysql_version 5.6)"
 tag_version "mysql" "5.7" "5.7  $(get_mysql_version 5.7)"
 tag_version "mysql" "8.0" "8.0  $(get_mysql_version 8.0) latest"
 ;;
@@ -135,7 +134,7 @@ tag_version "php" "$type-$version" "latest"
 elasticsearch)
 for version in 5.6 6.4 6.8 7.1 7.3 7.6 7.10 7.16 7.17 8.6
 do
-  docker-compose build ${BUILD_ARGS} elasticsearch-${version}
+  docker compose build ${BUILD_ARGS} elasticsearch-${version}
 done
 tag_version "elasticsearch" "5.6" "5 5.6 5.6.16"
 tag_version "elasticsearch" "6.4" "6.4 6.4.3"
