@@ -36,19 +36,19 @@ get_node_version() {
 
 
 get_python_version() {
-  docker-compose run --rm python-$1 python -V| grep "^Python " | sed "s/Python //" | sed 's/\r//'
+  docker compose run --rm python-$1 python -V| grep "^Python " | sed "s/Python //" | sed 's/\r//'
 }
 
 get_mysql_version() {
-  docker-compose run --rm "mysql-$1" mysqld --version | cut -d " " -f4
+  docker compose run --rm "mysql-$1" mysqld --version | cut -d " " -f4
 }
 
 get_percona_version() {
-  docker-compose run --rm "percona-$1" mysqld --version | cut -d " " -f4
+  docker compose run --rm "percona-$1" mysqld --version | cut -d " " -f4
 }
 
 get_mariadb_version() {
-  docker-compose run --rm "mariadb-$1" mysqld --version | \
+  docker compose run --rm "mariadb-$1" mysqld --version | \
     grep --only-matching --perl-regexp "\\d+\.\\d+\.\\d+-MariaDB" | \
     grep --only-matching --perl-regexp "\\d+\.\\d+\.\\d+"  | sed 's/\r//'
 }
@@ -60,7 +60,7 @@ get_apache_version() {
 }
 
 get_selenium_side_runner_version() {
-  docker-compose run --rm selenium-side-runner selenium-side-runner --version | sed 's/\r//'
+  docker compose run --rm selenium-side-runner selenium-side-runner --version | sed 's/\r//'
 }
 
 test() {
@@ -71,19 +71,19 @@ case $1 in
 
 ssh)
 # ssh (https://hub.docker.com/_/debian)
-docker-compose build ${BUILD_ARGS} ssh
+docker compose build ${BUILD_ARGS} ssh
 tag "ssh" "11 bullseye latest"
 ;;
 
 selenium-side-runner)
 # selenium-side-runner (https://hub.docker.com/_/node)
-docker-compose build ${BUILD_ARGS} selenium-side-runner
+docker compose build ${BUILD_ARGS} selenium-side-runner
 tag selenium-side-runner "$(get_selenium_side_runner_version) 14 latest"
 ;;
 
 apache)
 # apache (https://hub.docker.com/_/httpd)
-docker-compose build ${BUILD_ARGS} apache-2.4
+docker compose build ${BUILD_ARGS} apache-2.4
 tag_version "apache" "2.4" "2.4 $(get_apache_version 2.4) latest"
 ;;
 
@@ -91,7 +91,7 @@ mariadb)
 # mariadb (https://hub.docker.com/_/mariadb)
 for version in 10.2 10.3 10.4 10.5 10.6 10.7
 do
-  docker-compose build ${BUILD_ARGS} "mariadb-$version"
+  docker compose build ${BUILD_ARGS} "mariadb-$version"
 done
 tag_version "mariadb" "10.2" "10.2 $(get_mariadb_version 10.2)"
 tag_version "mariadb" "10.3" "10.3 $(get_mariadb_version 10.3)"
@@ -105,7 +105,7 @@ mysql)
 # mysql (https://hub.docker.com/_/mysql)
 for version in 5.6 5.7 8.0
 do
-  docker-compose build ${BUILD_ARGS} "mysql-$version"
+  docker compose build ${BUILD_ARGS} "mysql-$version"
 done
 tag_version "mysql" "5.6" "5.6 $(get_mysql_version 5.6)"
 tag_version "mysql" "5.7" "5.7  $(get_mysql_version 5.7)"
@@ -116,7 +116,7 @@ percona)
 # percona (https://hub.docker.com/r/percona/percona-server)
 for version in 5.7 8.0
 do
-  docker-compose build ${BUILD_ARGS} "percona-$version"
+  docker compose build ${BUILD_ARGS} "percona-$version"
 done
 tag_version "percona" "5.7" "5.7  $(get_percona_version 5.7)"
 tag_version "percona" "8.0" "8.0 $(get_percona_version 5.7) latest"
@@ -127,7 +127,7 @@ php)
 type=$2
 version=$3
 target="php-$type-$version"
-docker-compose build ${BUILD_ARGS} $target
+docker compose build ${BUILD_ARGS} $target
 tag_php_version $type $version "$version $(get_php_version "$type" $version)"
 tag_version "php" "$type-$version" "latest"
 ;;
@@ -152,7 +152,7 @@ tag_version "elasticsearch" "8.6" "8 8.6 8.6.2 latest"
 node)
 for version in 11 12 14 16 17 18
 do
-  docker-compose build ${BUILD_ARGS} node-${version}
+  docker compose build ${BUILD_ARGS} node-${version}
   if [ ${version} == "18" ]; then
     tag_version "node" $version "$version $(get_node_version "$version") latest"
   else
@@ -164,7 +164,7 @@ done
 python)
 for version in 3.10
 do
-  docker-compose build ${BUILD_ARGS} python-${version}
+  docker compose build ${BUILD_ARGS} python-${version}
   tag_version "python" $version "$version $(get_python_version "$version") latest"
 done
 ;;
@@ -172,7 +172,7 @@ done
 solr)
 for version in 7.7 8.9
 do
-  docker-compose build ${BUILD_ARGS} solr-${version}
+  docker compose build ${BUILD_ARGS} solr-${version}
 done
 tag_version "solr" "7.7" "7.7 7.7.3"
 tag_version "solr" "8.9" "8.9 8.9.0 latest"
