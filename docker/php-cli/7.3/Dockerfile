@@ -31,6 +31,13 @@ RUN set -x \
     && /usr/local/bin/generate-locales > /dev/null \
     && docker-image-cleanup > /dev/null
 
+# install npm
+RUN set -x \
+    && apt-update  > /dev/null\
+    && apt-install \
+        nodejs \
+        npm
+
 ADD https://github.com/mlocati/docker-php-extension-installer/releases/latest/download/install-php-extensions /usr/local/bin/
 
 RUN set -x \
