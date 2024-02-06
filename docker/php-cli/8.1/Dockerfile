@@ -25,6 +25,7 @@ RUN set -x \
         openssh-client \
         rsync \
         git \
+        git-flow \
         patch \
         # add mysqlclient to be able to access mysql from cli
         mariadb-client > /dev/null \
