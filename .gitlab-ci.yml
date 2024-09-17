@@ -51,6 +51,12 @@ build-percona:
     TARGET: percona
   <<: *build
 
+# build mariadb
+build-mariadb:
+  variables:
+    TARGET: mariadb
+  <<: *build
+
 # build php
 build-php-cli-7.3:
   variables:
@@ -81,6 +87,13 @@ build-php-cli-8.2:
     TYPE: cli
     VERSION: '8.2'
   <<: *build-php
+
+build-php-cli-8.3:
+  variables:
+    TYPE: cli
+    VERSION: '8.3'
+  <<: *build-php
+
 build-php-fpm-7.3:
   variables:
     TYPE: fpm
@@ -109,6 +122,12 @@ build-php-fpm-8.2:
   variables:
     TYPE: fpm
     VERSION: '8.2'
+  <<: *build-php
+
+build-php-fpm-8.3:
+  variables:
+    TYPE: fpm
+    VERSION: '8.3'
   <<: *build-php
 
 # build python
