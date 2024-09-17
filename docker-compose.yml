@@ -1,5 +1,3 @@
-version: "3"
-
 services:
 
   #
@@ -86,6 +84,21 @@ services:
     build:
       context: .
       dockerfile: docker/php-cli/8.2/Dockerfile
+    tty: true
+#
+# latest php 8.3
+#
+  php-fpm-8.3:
+    container_name: php-fpm-8.3
+    build:
+      context: .
+      dockerfile: docker/php-fpm/8.3/Dockerfile
+
+  php-cli-8.3:
+    container_name: php-cli-8.3
+    build:
+      context: .
+      dockerfile: docker/php-cli/8.3/Dockerfile
     tty: true
 
   #
@@ -197,6 +210,13 @@ services:
     build:
       context: .
       dockerfile: docker/mariadb/10.7/Dockerfile
+  mariadb-11.4:
+    container_name: mariadb-11.4
+    environment:
+      - MYSQL_ALLOW_EMPTY_PASSWORD=true
+    build:
+      context: .
+      dockerfile: docker/mariadb/11.4/Dockerfile
   #
   # apache 2.4.x
   #
