@@ -104,12 +104,13 @@ tag_version "mariadb" "11.4" "11.4 $(get_mariadb_version 11.4) latest"
 
 mysql)
 # mysql (https://hub.docker.com/_/mysql)
-for version in 5.7 8.0
+for version in 5.7 8.0 8.4
 do
   docker compose build ${BUILD_ARGS} "mysql-$version"
 done
 tag_version "mysql" "5.7" "5.7  $(get_mysql_version 5.7)"
-tag_version "mysql" "8.0" "8.0  $(get_mysql_version 8.0) latest"
+tag_version "mysql" "8.0" "8.0  $(get_mysql_version 8.0)"
+tag_version "mysql" "8.4" "8.4  $(get_mysql_version 8.4) latest"
 ;;
 
 percona)

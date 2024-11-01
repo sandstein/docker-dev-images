@@ -135,6 +135,17 @@ services:
       dockerfile: docker/mysql/8.0/Dockerfile
 
   #
+  # mysql 8.4
+  #
+  mysql-8.4:
+    container_name: mysql-8.4
+    environment:
+      - MYSQL_ALLOW_EMPTY_PASSWORD=true
+    build:
+      context: .
+      dockerfile: docker/mysql/8.4/Dockerfile
+
+  #
   # percona 5.7.25
   #
   percona-5.7:

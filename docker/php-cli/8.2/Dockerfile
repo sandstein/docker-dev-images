@@ -27,6 +27,7 @@ RUN set -x \
         git \
         git-flow \
         patch \
+        ghostscript \
         # add mysqlclient to be able to access mysql from cli
         mariadb-client > /dev/null \
     && /usr/local/bin/generate-locales > /dev/null \
