@@ -1,3 +1,6 @@
+variables:
+    DOCKER_DRIVER: overlay2
+    BUILD_TARGET: ''
 
 stages:
   - build
@@ -8,8 +11,6 @@ stages:
     - 'bin/build.sh $TARGET'
     - 'bin/push.sh $TARGET'
     - 'bin/cleanup.sh $TARGET'
-  only:
-    - /^master$/
   tags:
     - shell
 
@@ -19,8 +20,6 @@ stages:
     - 'bin/build.sh php $TYPE $VERSION'
     - 'bin/push.sh php'
     - 'bin/cleanup.sh php'
-  only:
-    - /^master$/
   tags:
     - shell
 
@@ -29,102 +28,153 @@ before_script:
 
 # build apache
 build-apache:
+  rules:
+    - if: $BUILD_TARGET == 'apache'
+      when: always
   variables:
     TARGET: apache
   <<: *build
 
 # build elasticsearch
 build-elasticsearch:
+  rules:
+    - if: $BUILD_TARGET == 'elasticsearch'
+      when: always
   variables:
     TARGET: elasticsearch
   <<: *build
 
 # build mysql
 build-mysql:
+  rules:
+    - if: $BUILD_TARGET == 'mysql'
+      when: always
   variables:
     TARGET: mysql
   <<: *build
 
 # build percona
 build-percona:
+  rules:
+    - if: $BUILD_TARGET == 'percona'
+      when: always
   variables:
     TARGET: percona
   <<: *build
 
 # build mariadb
 build-mariadb:
+  rules:
+    - if: $BUILD_TARGET == 'mariadb'
+      when: always
   variables:
     TARGET: mariadb
   <<: *build
 
 # build php
 build-php-cli-7.3:
+  rules:
+    - if: $BUILD_TARGET == 'php-cli-7.3'
+      when: always
   variables:
     TYPE: cli
     VERSION: '7.3'
   <<: *build-php
 
 build-php-cli-7.4:
+  rules:
+    - if: $BUILD_TARGET == 'php-cli-7.4'
+      when: always
   variables:
     TYPE: cli
     VERSION: '7.4'
   <<: *build-php
 
 build-php-cli-8.0:
+  rules:
+    - if: $BUILD_TARGET == 'php-cli-8.0'
+      when: always
   variables:
     TYPE: cli
     VERSION: '8.0'
   <<: *build-php
 
 build-php-cli-8.1:
+  rules:
+    - if: $BUILD_TARGET == 'php-cli-8.1'
+      when: always
   variables:
     TYPE: cli
     VERSION: '8.1'
   <<: *build-php
 
 build-php-cli-8.2:
+  rules:
+    - if: $BUILD_TARGET == '8.2'
+      when: always
   variables:
     TYPE: cli
     VERSION: '8.2'
   <<: *build-php
 
 build-php-cli-8.3:
+  rules:
+    - if: $BUILD_TARGET == '8.3'
+      when: always
   variables:
     TYPE: cli
     VERSION: '8.3'
   <<: *build-php
 
 build-php-fpm-7.3:
+  rules:
+    - if: $BUILD_TARGET == 'php-fpm-7.3'
+      when: always
   variables:
     TYPE: fpm
     VERSION: '7.3'
   <<: *build-php
 
 build-php-fpm-7.4:
+  rules:
+    - if: $BUILD_TARGET == 'php-fpm-7.4'
+      when: always
   variables:
     TYPE: fpm
     VERSION: '7.4'
   <<: *build-php
 
 build-php-fpm-8.0:
+  rules:
+    - if: $BUILD_TARGET == 'php-fpm-8.0'
+      when: always
   variables:
     TYPE: fpm
     VERSION: '8.0'
   <<: *build-php
 
 build-php-fpm-8.1:
+  rules:
+    - if: $BUILD_TARGET == 'php-fpm-8.1'
+      when: always
   variables:
     TYPE: fpm
     VERSION: '8.1'
   <<: *build-php
 
 build-php-fpm-8.2:
+  rules:
+    - if: $BUILD_TARGET == 'php-fpm-8.2'
+      when: always
   variables:
     TYPE: fpm
     VERSION: '8.2'
   <<: *build-php
 
 build-php-fpm-8.3:
+  rules:
+    - if: $BUILD_TARGET == 'php-fpm-8.3'
+      when: always
   variables:
     TYPE: fpm
     VERSION: '8.3'
@@ -132,30 +182,45 @@ build-php-fpm-8.3:
 
 # build python
 build-python:
+  rules:
+    - if: $BUILD_TARGET == 'python'
+      when: always
   variables:
     TARGET: python
   <<: *build
 
 # build selenium-side-runner
 build-selenium-side-runner:
+  rules:
+    - if: $BUILD_TARGET == 'selenium-side-runner'
+      when: always
   variables:
     TARGET: selenium-side-runner
   <<: *build
 
 # build solr
 build-solr:
+  rules:
+    - if: $BUILD_TARGET == 'solr'
+      when: always
   variables:
     TARGET: solr
   <<: *build
 
 # build ssh
 build-ssh:
+  rules:
+    - if: $BUILD_TARGET == 'ssh'
+      when: always
   variables:
     TARGET: ssh
   <<: *build
 
 # build node
 build-node:
+  rules:
+    - if: $BUILD_TARGET == 'node'
+      when: always
   variables:
     TARGET: node
   <<: *build
