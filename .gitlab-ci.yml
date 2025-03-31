@@ -38,6 +38,8 @@ test:
   rules: 
     - if: $BUILD_TARGET == "test"
       when: always
+  tags:
+    - shell
 
 # build apache
 build-apache:
