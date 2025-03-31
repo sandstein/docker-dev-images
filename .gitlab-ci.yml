@@ -1,7 +1,7 @@
 variables:
     DOCKER_DRIVER: overlay2
-    BUILD_TARGET: ''
-    BUILD_ALL: ''
+    BUILD_TARGET: ""
+    BUILD_ALL: "false"
 
 stages:
   - build
@@ -12,8 +12,6 @@ stages:
     - 'bin/build.sh $TARGET'
     - 'bin/push.sh $TARGET'
     - 'bin/cleanup.sh $TARGET'
-  only:
-    - branches
   tags:
     - shell
 
@@ -23,27 +21,25 @@ stages:
     - 'bin/build.sh php $TYPE $VERSION'
     - 'bin/push.sh php'
     - 'bin/cleanup.sh php'
-  only:
-    - branches
   tags:
     - shell
 
 before_script:
-  - docker compose pull
+  - docker-compose pull
 
 # build apache
 build-apache:
-  variables:
-    TARGET: apache
-  <<: *build
   rules:
     - if: $BUILD_TARGET == "apache" || $BUILD_ALL == "true"
       when: always
+  variables:
+    TARGET: apache
+  <<: *build
 
 # build elasticsearch
 build-elasticsearch:
   rules:
-    - if: $BUILD_TARGET == 'elasticsearch'
+    - if: $BUILD_TARGET == "elasticsearch" || $BUILD_ALL == "true"
       when: always
   variables:
     TARGET: elasticsearch
@@ -52,7 +48,7 @@ build-elasticsearch:
 # build mysql
 build-mysql:
   rules:
-    - if: $BUILD_TARGET == 'mysql'
+    - if: $BUILD_TARGET == "mysql" || $BUILD_ALL == "true"
       when: always
   variables:
     TARGET: mysql
@@ -61,7 +57,7 @@ build-mysql:
 # build percona
 build-percona:
   rules:
-    - if: $BUILD_TARGET == 'percona'
+    - if: $BUILD_TARGET == "percona" || $BUILD_ALL == "true"
       when: always
   variables:
     TARGET: percona
@@ -70,7 +66,7 @@ build-percona:
 # build mariadb
 build-mariadb:
   rules:
-    - if: $BUILD_TARGET == 'mariadb'
+    - if: $BUILD_TARGET == "mariadb" || $BUILD_ALL == "true"
       when: always
   variables:
     TARGET: mariadb
@@ -79,7 +75,7 @@ build-mariadb:
 # build php
 build-php-cli-7.3:
   rules:
-    - if: $BUILD_TARGET == 'php-cli-7.3'
+    - if: $BUILD_TARGET == "php-cli-7.3" || $BUILD_ALL == "true"
       when: always
   variables:
     TYPE: cli
@@ -88,7 +84,7 @@ build-php-cli-7.3:
 
 build-php-cli-7.4:
   rules:
-    - if: $BUILD_TARGET == 'php-cli-7.4'
+    - if: $BUILD_TARGET == "php-cli-7.4" || $BUILD_ALL == "true"
       when: always
   variables:
     TYPE: cli
@@ -97,7 +93,7 @@ build-php-cli-7.4:
 
 build-php-cli-8.0:
   rules:
-    - if: $BUILD_TARGET == 'php-cli-8.0'
+    - if: $BUILD_TARGET == "php-cli-8.0" || $BUILD_ALL == "true"
       when: always
   variables:
     TYPE: cli
@@ -106,7 +102,7 @@ build-php-cli-8.0:
 
 build-php-cli-8.1:
   rules:
-    - if: $BUILD_TARGET == 'php-cli-8.1'
+    - if: $BUILD_TARGET == "php-cli-8.1" || $BUILD_ALL == "true"
       when: always
   variables:
     TYPE: cli
@@ -115,7 +111,7 @@ build-php-cli-8.1:
 
 build-php-cli-8.2:
   rules:
-    - if: $BUILD_TARGET == '8.2'
+    - if: $BUILD_TARGET == "8.2" || $BUILD_ALL == "true"
       when: always
   variables:
     TYPE: cli
@@ -123,17 +119,17 @@ build-php-cli-8.2:
   <<: *build-php
 
 build-php-cli-8.3:
+  rules:
+    - if: $BUILD_TARGET == "8.3" || $BUILD_ALL == "true"
+      when: always
   variables:
     TYPE: cli
     VERSION: '8.3'
   <<: *build-php
-  rules:
-    - if: $BUILD_TARGET == "8.3" || $BUILD_ALL == "true"
-      when: always
 
 build-php-fpm-7.3:
   rules:
-    - if: $BUILD_TARGET == 'php-fpm-7.3'
+    - if: $BUILD_TARGET == "php-fpm-7.3" || $BUILD_ALL == "true"
       when: always
   variables:
     TYPE: fpm
@@ -142,7 +138,7 @@ build-php-fpm-7.3:
 
 build-php-fpm-7.4:
   rules:
-    - if: $BUILD_TARGET == 'php-fpm-7.4'
+    - if: $BUILD_TARGET == "php-fpm-7.4" || $BUILD_ALL == "true"
       when: always
   variables:
     TYPE: fpm
@@ -151,7 +147,7 @@ build-php-fpm-7.4:
 
 build-php-fpm-8.0:
   rules:
-    - if: $BUILD_TARGET == 'php-fpm-8.0'
+    - if: $BUILD_TARGET == "php-fpm-8.0" || $BUILD_ALL == "true"
       when: always
   variables:
     TYPE: fpm
@@ -160,7 +156,7 @@ build-php-fpm-8.0:
 
 build-php-fpm-8.1:
   rules:
-    - if: $BUILD_TARGET == 'php-fpm-8.1'
+    - if: $BUILD_TARGET == "php-fpm-8.1" || $BUILD_ALL == "true"
       when: always
   variables:
     TYPE: fpm
@@ -169,7 +165,7 @@ build-php-fpm-8.1:
 
 build-php-fpm-8.2:
   rules:
-    - if: $BUILD_TARGET == 'php-fpm-8.2'
+    - if: $BUILD_TARGET == "php-fpm-8.2" || $BUILD_ALL == "true"
       when: always
   variables:
     TYPE: fpm
@@ -178,7 +174,7 @@ build-php-fpm-8.2:
 
 build-php-fpm-8.3:
   rules:
-    - if: $BUILD_TARGET == 'php-fpm-8.3'
+    - if: $BUILD_TARGET == "php-fpm-8.3" || $BUILD_ALL == "true"
       when: always
   variables:
     TYPE: fpm
@@ -188,7 +184,7 @@ build-php-fpm-8.3:
 # build python
 build-python:
   rules:
-    - if: $BUILD_TARGET == 'python'
+    - if: $BUILD_TARGET == "python" || $BUILD_ALL == "true"
       when: always
   variables:
     TARGET: python
@@ -197,7 +193,7 @@ build-python:
 # build selenium-side-runner
 build-selenium-side-runner:
   rules:
-    - if: $BUILD_TARGET == 'selenium-side-runner'
+    - if: $BUILD_TARGET == "selenium-side-runner" || $BUILD_ALL == "true"
       when: always
   variables:
     TARGET: selenium-side-runner
@@ -206,7 +202,7 @@ build-selenium-side-runner:
 # build solr
 build-solr:
   rules:
-    - if: $BUILD_TARGET == 'solr'
+    - if: $BUILD_TARGET == "solr" || $BUILD_ALL == "true"
       when: always
   variables:
     TARGET: solr
@@ -215,7 +211,7 @@ build-solr:
 # build ssh
 build-ssh:
   rules:
-    - if: $BUILD_TARGET == 'ssh'
+    - if: $BUILD_TARGET == "ssh" || $BUILD_ALL == "true"
       when: always
   variables:
     TARGET: ssh
@@ -224,7 +220,7 @@ build-ssh:
 # build node
 build-node:
   rules:
-    - if: $BUILD_TARGET == 'node'
+    - if: $BUILD_TARGET == "node" || $BUILD_ALL == "true"
       when: always
   variables:
     TARGET: node
