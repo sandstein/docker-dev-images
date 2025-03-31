@@ -1,6 +1,7 @@
 variables:
     DOCKER_DRIVER: overlay2
     BUILD_TARGET: ''
+    BUILD_ALL: ''
 
 stages:
   - build
@@ -11,6 +12,8 @@ stages:
     - 'bin/build.sh $TARGET'
     - 'bin/push.sh $TARGET'
     - 'bin/cleanup.sh $TARGET'
+  only:
+    - branches
   tags:
     - shell
 
@@ -20,20 +23,22 @@ stages:
     - 'bin/build.sh php $TYPE $VERSION'
     - 'bin/push.sh php'
     - 'bin/cleanup.sh php'
+  only:
+    - branches
   tags:
     - shell
 
 before_script:
-  - docker-compose pull
+  - docker compose pull
 
 # build apache
 build-apache:
-  rules:
-    - if: $BUILD_TARGET == 'apache'
-      when: always
   variables:
     TARGET: apache
   <<: *build
+  rules:
+    - if: $BUILD_TARGET == "apache" || $BUILD_ALL == "true"
+      when: always
 
 # build elasticsearch
 build-elasticsearch:
@@ -118,13 +123,13 @@ build-php-cli-8.2:
   <<: *build-php
 
 build-php-cli-8.3:
-  rules:
-    - if: $BUILD_TARGET == '8.3'
-      when: always
   variables:
     TYPE: cli
     VERSION: '8.3'
   <<: *build-php
+  rules:
+    - if: $BUILD_TARGET == "8.3" || $BUILD_ALL == "true"
+      when: always
 
 build-php-fpm-7.3:
   rules:
