@@ -141,6 +141,15 @@ build-php-cli-8.3:
     - if: $BUILD_TARGET == "php-cli-8.3" || $BUILD_ALL == "true"
       when: always
 
+build-php-cli-8.4:
+  variables:
+    TYPE: cli
+    VERSION: '8.4'
+  <<: *build-php
+  rules:
+    - if: $BUILD_TARGET == "php-cli-8.4" || $BUILD_ALL == "true"
+      when: always
+
 build-php-fpm-7.3:
   variables:
     TYPE: fpm
@@ -193,6 +202,15 @@ build-php-fpm-8.3:
   <<: *build-php
   rules:
     - if: $BUILD_TARGET == "php-fpm-8.3" || $BUILD_ALL == "true"
+      when: always
+
+build-php-fpm-8.4:
+  variables:
+    TYPE: fpm
+    VERSION: '8.4'
+  <<: *build-php
+  rules:
+    - if: $BUILD_TARGET == "php-fpm-8.4" || $BUILD_ALL == "true"
       when: always
 
 # build python
