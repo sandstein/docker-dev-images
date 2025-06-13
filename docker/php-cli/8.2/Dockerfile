@@ -52,6 +52,7 @@ RUN set -x \
       bz2 \
       calendar \
       exif \
+      ftp \
       gd \
       geospatial \
       gettext \
