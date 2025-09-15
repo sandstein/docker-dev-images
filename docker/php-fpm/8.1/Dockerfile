@@ -68,6 +68,7 @@ RUN set -x \
       shmop \
       soap \
       sockets \
+      sourceguardian \
       sysvmsg \
       sysvsem \
       sysvshm \
