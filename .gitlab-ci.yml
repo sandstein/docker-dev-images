@@ -17,7 +17,7 @@ stages:
     - 'bin/push.sh $TARGET'
     - 'bin/cleanup.sh $TARGET'
   tags:
-    - shell
+    - devimages
 
 .build-php: &build-php
   stage: build
@@ -26,7 +26,7 @@ stages:
     - 'bin/push.sh php'
     - 'bin/cleanup.sh php'
   tags:
-    - shell
+    - devimages
 
 before_script:
   - docker compose pull
@@ -35,11 +35,11 @@ test:
   stage: test
   script:
     - echo $BUILD_TARGET
-  rules: 
+  rules:
     - if: $BUILD_TARGET == "test"
       when: always
   tags:
-    - shell
+    - devimages
 
 # build apache
 build-apache:
