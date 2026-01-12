@@ -3,7 +3,7 @@ set -e
 
 while IFS= read -r line; do
   echo "building tunnel for: $line"
-  ssh -Nf $line < /dev/null
+  AUTOSSH_GATETIME=0 autossh -M 0 -Nf $line < /dev/null
 done < /home/ssh/.tunnel/tunnel.conf
 
 while true; do

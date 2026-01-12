@@ -32,6 +32,7 @@ RUN set -x \
         rsync \
         git \
         patch \
+        autossh \
     && /usr/local/bin/generate-locales \
     && docker-image-cleanup
 
