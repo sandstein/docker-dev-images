@@ -161,28 +161,6 @@ services:
       dockerfile: docker/mysql/8.4/Dockerfile
 
   #
-  # percona 5.7.25
-  #
-  percona-5.7:
-    container_name: percona-5.7
-    environment:
-       - MYSQL_ALLOW_EMPTY_PASSWORD=true
-    build:
-      context: .
-      dockerfile: docker/percona/5.7/Dockerfile
-
-  #
-  # percona 8.0.15
-  #
-  percona-8.0:
-    container_name: percona-8.0
-    environment:
-      - MYSQL_ALLOW_EMPTY_PASSWORD=true
-    build:
-      context: .
-      dockerfile: docker/percona/8.0/Dockerfile
-
-  #
   # mariadb 10.2.23
   #
   mariadb-10.2:
@@ -360,16 +338,3 @@ services:
     build:
       context: .
       dockerfile: docker/python/3.10/Dockerfile
-
-  solr-7.7:
-    container_name: solr-7.7
-    build:
-      context: .
-      dockerfile: docker/solr/7.7/Dockerfile
-
-  solr-8.9:
-    container_name: solr-8.9
-    build:
-      context: .
-      dockerfile: docker/solr/8.9/Dockerfile
-
