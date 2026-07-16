@@ -115,6 +115,21 @@ services:
       context: .
       dockerfile: docker/php-cli/8.4/Dockerfile
     tty: true
+  #
+  # latest php 8.4
+  #
+  php-fpm-8.5:
+    container_name: php-fpm-8.5
+    build:
+      context: .
+      dockerfile: docker/php-fpm/8.5/Dockerfile
+
+  php-cli-8.5:
+    container_name: php-cli-8.5
+    build:
+      context: .
+      dockerfile: docker/php-cli/8.5/Dockerfile
+    tty: true
 
   #
   # mysql 5.5.62
@@ -221,6 +236,13 @@ services:
     build:
       context: .
       dockerfile: docker/mariadb/11.4/Dockerfile
+  mariadb-11.8:
+    container_name: mariadb-11.8
+    environment:
+      - MYSQL_ALLOW_EMPTY_PASSWORD=true
+    build:
+      context: .
+      dockerfile: docker/mariadb/11.8/Dockerfile
   #
   # apache 2.4.x
   #

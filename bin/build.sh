@@ -1,6 +1,7 @@
 #!/bin/bash
 
-BUILD_ARGS="--force-rm --pull"
+#BUILD_ARGS="--force-rm --pull"
+BUILD_ARGS=""
 PWD=$(pwd)
 PROJECT_NAME=$(basename "${PWD}")
 
@@ -48,9 +49,18 @@ get_percona_version() {
 }
 
 get_mariadb_version() {
-  docker compose run --rm "mariadb-$1" mysqld --version | \
-    grep --only-matching --perl-regexp "\\d+\.\\d+\.\\d+-MariaDB" | \
-    grep --only-matching --perl-regexp "\\d+\.\\d+\.\\d+"  | sed 's/\r//'
+  major=${1%%.*}
+  minor=${1##*.}
+
+  if (( $major > 11 || ($major == 11 && $minor >= 8) )); then
+    docker compose run --rm "mariadb-$1" mariadbd --version | \
+      grep --only-matching --perl-regexp "\\d+\.\\d+\.\\d+-MariaDB" | \
+      grep --only-matching --perl-regexp "\\d+\.\\d+\.\\d+"  | sed 's/\r//'
+  else
+    docker compose run --rm "mariadb-$1" mysqld --version | \
+      grep --only-matching --perl-regexp "\\d+\.\\d+\.\\d+-MariaDB" | \
+      grep --only-matching --perl-regexp "\\d+\.\\d+\.\\d+"  | sed 's/\r//'
+  fi
 }
 
 get_apache_version() {
@@ -89,7 +99,7 @@ tag_version "apache" "2.4" "2.4 $(get_apache_version 2.4) latest"
 
 mariadb)
 # mariadb (https://hub.docker.com/_/mariadb)
-for version in 10.2 10.3 10.4 10.5 10.6 10.7 11.4
+for version in 10.2 10.3 10.4 10.5 10.6 10.7 11.4 11.8
 do
   docker compose build ${BUILD_ARGS} "mariadb-$version"
 done
@@ -99,7 +109,8 @@ tag_version "mariadb" "10.4" "10.4 $(get_mariadb_version 10.4)"
 tag_version "mariadb" "10.5" "10.5 $(get_mariadb_version 10.5)"
 tag_version "mariadb" "10.6" "10.6 $(get_mariadb_version 10.6)"
 tag_version "mariadb" "10.7" "10.7 $(get_mariadb_version 10.7)"
-tag_version "mariadb" "11.4" "11.4 $(get_mariadb_version 11.4) latest"
+tag_version "mariadb" "11.4" "11.4 $(get_mariadb_version 11.4)"
+tag_version "mariadb" "11.8" "11.8 $(get_mariadb_version 11.8) latest"
 ;;
 
 mysql)
