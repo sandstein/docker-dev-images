@@ -47,6 +47,7 @@ RUN set -x \
       gmagick \
       gnupg \
       grpc \
+      imagick \
       imap \
       intl \
       ldap \

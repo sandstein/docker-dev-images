@@ -68,15 +68,6 @@ build-mysql:
     - if: $BUILD_TARGET == "mysql" || $BUILD_ALL == "true"
       when: always
 
-# build percona
-build-percona:
-  variables:
-    TARGET: percona
-  <<: *build
-  rules:
-    - if: $BUILD_TARGET == "percona" || $BUILD_ALL == "true"
-      when: always
-
 # build mariadb
 build-mariadb:
   variables:
@@ -230,16 +221,6 @@ build-selenium-side-runner:
   rules:
     - if: $BUILD_TARGET == "selenium-side-runner" || $BUILD_ALL == "true"
       when: always
-
-# build solr
-build-solr:
-  variables:
-    TARGET: solr
-  <<: *build
-  rules:
-    - if: $BUILD_TARGET == "solr" || $BUILD_ALL == "true"
-      when: always
-
 # build ssh
 build-ssh:
   variables:

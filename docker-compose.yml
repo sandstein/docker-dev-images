@@ -115,6 +115,21 @@ services:
       context: .
       dockerfile: docker/php-cli/8.4/Dockerfile
     tty: true
+  #
+  # latest php 8.4
+  #
+  php-fpm-8.5:
+    container_name: php-fpm-8.5
+    build:
+      context: .
+      dockerfile: docker/php-fpm/8.5/Dockerfile
+
+  php-cli-8.5:
+    container_name: php-cli-8.5
+    build:
+      context: .
+      dockerfile: docker/php-cli/8.5/Dockerfile
+    tty: true
 
   #
   # mysql 5.5.62
@@ -159,28 +174,6 @@ services:
     build:
       context: .
       dockerfile: docker/mysql/8.4/Dockerfile
-
-  #
-  # percona 5.7.25
-  #
-  percona-5.7:
-    container_name: percona-5.7
-    environment:
-       - MYSQL_ALLOW_EMPTY_PASSWORD=true
-    build:
-      context: .
-      dockerfile: docker/percona/5.7/Dockerfile
-
-  #
-  # percona 8.0.15
-  #
-  percona-8.0:
-    container_name: percona-8.0
-    environment:
-      - MYSQL_ALLOW_EMPTY_PASSWORD=true
-    build:
-      context: .
-      dockerfile: docker/percona/8.0/Dockerfile
 
   #
   # mariadb 10.2.23
@@ -243,6 +236,13 @@ services:
     build:
       context: .
       dockerfile: docker/mariadb/11.4/Dockerfile
+  mariadb-11.8:
+    container_name: mariadb-11.8
+    environment:
+      - MYSQL_ALLOW_EMPTY_PASSWORD=true
+    build:
+      context: .
+      dockerfile: docker/mariadb/11.8/Dockerfile
   #
   # apache 2.4.x
   #
@@ -360,16 +360,3 @@ services:
     build:
       context: .
       dockerfile: docker/python/3.10/Dockerfile
-
-  solr-7.7:
-    container_name: solr-7.7
-    build:
-      context: .
-      dockerfile: docker/solr/7.7/Dockerfile
-
-  solr-8.9:
-    container_name: solr-8.9
-    build:
-      context: .
-      dockerfile: docker/solr/8.9/Dockerfile
-
