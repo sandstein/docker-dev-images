@@ -2,6 +2,8 @@ FROM php:7.3-cli
 
 LABEL de.sandstein.dde="php"
 
+ENV LANG=C.UTF-8
+
 COPY files/usr/local/bin /usr/local/bin
 
 RUN set -x \
@@ -40,7 +42,7 @@ RUN set -x \
         nodejs \
         npm
 
-ADD https://github.com/mlocati/docker-php-extension-installer/releases/latest/download/install-php-extensions /usr/local/bin/
+ADD https://github.com/mlocati/docker-php-extension-installer/releases/download/2.13.2/install-php-extensions /usr/local/bin/
 
 RUN set -x \
     && chmod +x /usr/local/bin/install-php-extensions \
@@ -100,4 +102,6 @@ RUN set -x \
 RUN groupadd -g 1000 phpcli && \
     useradd -u 1000 -g 1000 -m -s /bin/bash phpcli
 
-VOLUME /home/phpcli/.ssh /home/phpcli/.config
+RUN mkdir -p /home/phpcli/.config /home/phpcli/.ssh \
+    && chmod 700 /home/phpcli/.ssh \
+    && chown -R phpcli:phpcli /home/phpcli

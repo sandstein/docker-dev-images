@@ -56,7 +56,7 @@ build-elasticsearch:
     TARGET: elasticsearch
   <<: *build
   rules:
-    - if: $BUILD_TARGET == "elasticsearch" || $BUILD_ALL == "true"
+    - if: $BUILD_TARGET == "elasticsearch"  # frozen: not part of BUILD_ALL
       when: always
 
 # build mysql
@@ -84,7 +84,7 @@ build-php-cli-7.3:
     VERSION: '7.3'
   <<: *build-php
   rules:
-    - if: $BUILD_TARGET == "php-cli-7.3" || $BUILD_ALL == "true"
+    - if: $BUILD_TARGET == "php-cli-7.3"  # frozen: not part of BUILD_ALL
       when: always
 
 build-php-cli-7.4:
@@ -93,7 +93,7 @@ build-php-cli-7.4:
     VERSION: '7.4'
   <<: *build-php
   rules:
-    - if: $BUILD_TARGET == "php-cli-7.4" || $BUILD_ALL == "true"
+    - if: $BUILD_TARGET == "php-cli-7.4"  # frozen: not part of BUILD_ALL
       when: always
 
 build-php-cli-8.0:
@@ -102,7 +102,7 @@ build-php-cli-8.0:
     VERSION: '8.0'
   <<: *build-php
   rules:
-    - if: $BUILD_TARGET == "php-cli-8.0" || $BUILD_ALL == "true"
+    - if: $BUILD_TARGET == "php-cli-8.0"  # frozen: not part of BUILD_ALL
       when: always
 
 build-php-cli-8.1:
@@ -111,7 +111,7 @@ build-php-cli-8.1:
     VERSION: '8.1'
   <<: *build-php
   rules:
-    - if: $BUILD_TARGET == "php-cli-8.1" || $BUILD_ALL == "true"
+    - if: $BUILD_TARGET == "php-cli-8.1"  # frozen: not part of BUILD_ALL
       when: always
 
 build-php-cli-8.2:
@@ -141,13 +141,22 @@ build-php-cli-8.4:
     - if: $BUILD_TARGET == "php-cli-8.4" || $BUILD_ALL == "true"
       when: always
 
+build-php-cli-8.5:
+  variables:
+    TYPE: cli
+    VERSION: '8.5'
+  <<: *build-php
+  rules:
+    - if: $BUILD_TARGET == "php-cli-8.5" || $BUILD_ALL == "true"
+      when: always
+
 build-php-fpm-7.3:
   variables:
     TYPE: fpm
     VERSION: '7.3'
   <<: *build-php
   rules:
-    - if: $BUILD_TARGET == "php-fpm-7.3" || $BUILD_ALL == "true"
+    - if: $BUILD_TARGET == "php-fpm-7.3"  # frozen: not part of BUILD_ALL
       when: always
 
 build-php-fpm-7.4:
@@ -156,7 +165,7 @@ build-php-fpm-7.4:
     VERSION: '7.4'
   <<: *build-php
   rules:
-    - if: $BUILD_TARGET == "php-fpm-7.4" || $BUILD_ALL == "true"
+    - if: $BUILD_TARGET == "php-fpm-7.4"  # frozen: not part of BUILD_ALL
       when: always
 
 build-php-fpm-8.0:
@@ -165,7 +174,7 @@ build-php-fpm-8.0:
     VERSION: '8.0'
   <<: *build-php
   rules:
-    - if: $BUILD_TARGET == "php-fpm-8.0" || $BUILD_ALL == "true"
+    - if: $BUILD_TARGET == "php-fpm-8.0"  # frozen: not part of BUILD_ALL
       when: always
 
 build-php-fpm-8.1:
@@ -174,7 +183,7 @@ build-php-fpm-8.1:
     VERSION: '8.1'
   <<: *build-php
   rules:
-    - if: $BUILD_TARGET == "php-fpm-8.1" || $BUILD_ALL == "true"
+    - if: $BUILD_TARGET == "php-fpm-8.1"  # frozen: not part of BUILD_ALL
       when: always
 
 build-php-fpm-8.2:
@@ -202,6 +211,15 @@ build-php-fpm-8.4:
   <<: *build-php
   rules:
     - if: $BUILD_TARGET == "php-fpm-8.4" || $BUILD_ALL == "true"
+      when: always
+
+build-php-fpm-8.5:
+  variables:
+    TYPE: fpm
+    VERSION: '8.5'
+  <<: *build-php
+  rules:
+    - if: $BUILD_TARGET == "php-fpm-8.5" || $BUILD_ALL == "true"
       when: always
 
 # build python

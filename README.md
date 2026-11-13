@@ -12,7 +12,9 @@ files belonging to other users.
 
 ## Scripts
 
-The project contains two scripts, one for building the different containers and one for pushing them to docker hub.
+The project contains three scripts: one for building the different containers, one for pushing them to docker hub and
+one for cleaning up afterwards. Run them from the repository root.
+
 ### build.sh
 To locally build one or all containers of a specific variety use
 ```shell
@@ -23,26 +25,51 @@ all variants of the container type except for php, where you have to use
 ```shell
 $ bin/build.sh php <type> <version>
 ```
-which will build the fpm or cli type of the latest minor version of version, eg.:
+which will build the fpm or cli type of the latest patch version of version, eg.:
 ```shell
-$ bin/build.sh php cli 8.2
+$ bin/build.sh php cli 8.4
 ```
-will (at the time of writing) build and tag a php cli container with v8.2.3.
+builds and tags `sandstein/php:cli-8.4` and `sandstein/php:cli-8.4.<patch>`.
+
+The script stops at the first failing build or version check. To try a build without overwriting your local
+`sandstein/*` images, set another namespace:
+```shell
+$ NAMESPACE=test bin/build.sh mariadb
+```
 
 ### push.sh
 This command is used to push the locally tagged version to docker hub. Use:
 
 ```shell
-$ bin/build.sh <container>
+$ bin/push.sh <container>
 ```
 Beware: this pushes to the [sandstein repositories](https://hub.docker.com/orgs/sandstein/repositories), 
 which you probably do not have access for. so if you want to use your own repository you should change
 the file here.
 
+### cleanup.sh
+Removes the local images of a container type (by their `de.sandstein.dde` label):
+```shell
+$ bin/cleanup.sh <container>
+```
+
 ### .gitlab-ci.yml
 To automatize the push of the latest versions there is a Gitlab-CI configuration which regularly builds the
-docker containers and pushes them to dockerhub.
+docker containers and pushes them to dockerhub. A pipeline schedule with `BUILD_ALL=true` rebuilds everything,
+`BUILD_TARGET=<container>` (e.g. `mariadb` or `php-cli-8.4`) builds a single job.
 For now sandstein's own gitlab instance is used to do so, we might change this to some GitHub Actions in the future.
+
+## Changing user and group IDs
+
+All images contain `modify-user-ids`:
+
+```dockerfile
+RUN modify-user-ids <user> <uid> <gid>
+```
+
+It changes the uid and the primary group of the user and keeps the files in the user's home directory owned by the
+user. If the uid is already used by another user of the image, it is shared. If a group with the gid already exists
+(e.g. gid 20 on macOS, which is `dialout` in Debian), the user joins that group.
 
 ## Container
 
@@ -72,45 +99,48 @@ RUN bin/elasticsearch-plugin install analysis-phonetic \
 ```
 in your Dockerfile to run it as your current user and to install additional plugins.
 
-## mariadb
+Elasticsearch 8 runs as the `elasticsearch` user. The 8.6 image therefore stays `root`, so the lines above work
+unchanged, and its entrypoint starts Elasticsearch as the (renumbered) `elasticsearch` user. For a local single node
+without TLS set `discovery.type=single-node` and `xpack.security.enabled=false`.
 
-Versions 10.2 to 10.7 are prepared. Use
+Before November 2026 some tags contained other versions: `7.6` was 7.3.2, `7.17` was 7.16.3 and `8.6` was 7.17.8.
 
-```dockerfile
-ARG USER_ID=999
-ARG GROUP_ID=999
-RUN modify-ids mysql ${USER_ID} ${GROUP_ID}
-```
-for user customisation.
+### mariadb
 
-## mysql
-
-Versions 5.6, 5.7 and 8.0 are prepared. Use
+Versions 10.2 to 10.7, 11.4 and 11.8 are prepared. Use
 
 ```dockerfile
 ARG USER_ID=999
 ARG GROUP_ID=999
-RUN modify-ids mysql ${USER_ID} ${GROUP_ID}
+RUN modify-user-ids mysql ${USER_ID} ${GROUP_ID}
 ```
 for user customisation.
 
-## node
-NodeJS container for versions 11, 12, 14, 16 and 18 are provided. They include the node-build-tools. No user customisation
-available, since it was not needed.
+### mysql
 
-## percona
-
-Versions 5.7 and 8.0 are provided. Use
+Versions 5.7, 8.0 and 8.4 are prepared. Use
 
 ```dockerfile
 ARG USER_ID=999
 ARG GROUP_ID=999
-RUN modify-ids mysql ${USER_ID} ${GROUP_ID}
+RUN modify-user-ids mysql ${USER_ID} ${GROUP_ID}
 ```
 for user customisation.
+
+### node
+NodeJS containers for the LTS versions 22, 24 and 26 (Debian trixie) are provided; `latest` is 26. They include
+the node-build-tools. Use
+
+```dockerfile
+ARG USER_ID=1000
+ARG GROUP_ID=1000
+RUN modify-user-ids node ${USER_ID} ${GROUP_ID}
+```
+for user customisation. The old images for node 11 to 18 stay on Docker Hub but are not built anymore
+(`node:12` and `node:14` contained node 16).
 
 ### php
-A collection of all mayor PHP versions (from 7.3 to 8.2) as fpm and cli. Use
+A collection of all major PHP versions (from 7.3 to 8.5) as fpm and cli. Use
 
 ```dockerfile
 ARG USER_ID=33
@@ -125,11 +155,12 @@ ARG USER_ID=1000
 ARG GROUP_ID=1000
 RUN modify-user-ids phpcli ${USER_ID} ${GROUP_ID}
 ```
-for the cli containers
+for the cli containers. `sandstein/php:latest` is the newest cli image.
 
 #### php modules
 The containers try to include all available modules. When using the containers, you can disable
-the modules in your config. If you miss something just add a PR, most of the modules are built with 
+the modules in your config, e.g. with `disable-php-modules xdebug,xhprof`. If you miss something just add a PR,
+most of the modules are built with 
 [Docker PHP-Extension Installer](https://github.com/mlocati/docker-php-extension-installer), so if a module can be
 installed it is really easy to add it.
 
@@ -138,38 +169,24 @@ A python image (v3.10) is provided. It includes a user which can be mapped to yo
 ```dockerfile
 ARG USER_ID=1000
 ARG GROUP_ID=1000
-RUN modify-user-ids phpcli ${USER_ID} ${GROUP_ID} 
+RUN modify-user-ids python ${USER_ID} ${GROUP_ID} 
 ``` 
 
 ### selenium-side-runner
-Based on NodeJS v14 this image can be used to run selenium tests
-
-### solr
-Provides versions 7.6 and 8.9 of the search platform. Use
-
-```dockerfile
-ARG USER_ID=1000
-ARG GROUP_ID=1000
-RUN modify-user-ids solr ${USER_ID} ${GROUP_ID} \
-    mkdir /opt/solr/lib \
-    chown -R solr.solr /opt/solr \
-    chown -R solr.solr /opt/docker-solr
-
-USER solr
-```
-to run solar as your local user.
+Based on NodeJS 24 (Debian trixie) this image can be used to run selenium tests. The old `14` tag is not built anymore.
 
 ### ssh
-A slim debian with an additional user "ssh", mainly used for port forwarding. To use in your own context
+A slim debian (13, trixie) with an additional user "ssh", mainly used for port forwarding. To use in your own context
 add this to your Dockerfile
 
 ```dockerfile
 ARG USER_ID=1000
 ARG GROUP_ID=1000
-RUN modify-ids ssh ${USER_ID} ${GROUP_ID}
+RUN modify-user-ids ssh ${USER_ID} ${GROUP_ID}
 ```
 
 See especially the [docker-compose.yml](https://github.com/sandstein/docker-dev-environment/blob/7355445575f2ae650941bbf0bdb4f1ad699303e6/docker-compose.yml#L610)
 in [Docker Development Environment](https://github.com/sandstein/docker-dev-environment) for more details.
 
-
+### No longer built
+`percona` (5.7, 8.0) and `solr` (7.7, 8.9) are not built anymore. Their last images stay available on Docker Hub.
