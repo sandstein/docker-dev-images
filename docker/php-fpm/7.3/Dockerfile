@@ -2,6 +2,8 @@ FROM php:7.3-fpm
 
 LABEL de.sandstein.dde="php"
 
+ENV LANG=C.UTF-8
+
 COPY files/usr/local/bin /usr/local/bin
 
 RUN set -x \
@@ -29,7 +31,7 @@ RUN set -x \
     && /usr/local/bin/generate-locales > /dev/null \
     && docker-image-cleanup > /dev/null
 
-ADD https://github.com/mlocati/docker-php-extension-installer/releases/latest/download/install-php-extensions /usr/local/bin/
+ADD https://github.com/mlocati/docker-php-extension-installer/releases/download/2.13.2/install-php-extensions /usr/local/bin/
 
 RUN set -x \
     && chmod +x /usr/local/bin/install-php-extensions \

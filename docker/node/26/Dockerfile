@@ -1,4 +1,4 @@
-FROM node:14-bullseye
+FROM node:26-trixie
 
 LABEL de.sandstein.dde="node"
 

@@ -1,4 +1,4 @@
-FROM node:14-bullseye-slim
+FROM node:24-trixie-slim
 
 LABEL de.sandstein.dde="selenium-side-runner"
 

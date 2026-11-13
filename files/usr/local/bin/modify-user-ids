@@ -1,25 +1,68 @@
 #!/bin/bash
+#
+# modify-user-ids <user> [<uid> [<gid>]]
+#
+# Changes the uid and the primary gid of <user>, so files written in the
+# container belong to the host user. Used at build time in Dockerfiles:
+#
+#   RUN modify-user-ids www-data ${USER_ID} ${GROUP_ID}
+#
+# - The uid may already belong to another user of the image (e.g. 1000);
+#   it is then shared (usermod -o), which is harmless in a container.
+# - If a group with <gid> already exists (e.g. gid 20 on macOS = dialout),
+#   the user joins that group as primary group. Otherwise the user's own
+#   primary group gets the new gid.
+# - Files in the user's home directory keep belonging to the user.
 
-set -o nounset   ## set -u : exit the script if you try to use an uninitialised variable
-set -o errexit   ## set -e : exit the script if any statement returns a non-true return value
+set -o nounset
+set -o errexit
+set -o pipefail
 
-modifyUserId() {
-    if [ $# = 2 ]; then
-        usermod -u "$2" "$1"
+if [[ $# -lt 1 || $# -gt 3 ]]; then
+    echo "usage: modify-user-ids <user> [<uid> [<gid>]]" >&2
+    exit 2
+fi
+
+user=$1
+uid=${2:-}
+gid=${3:-}
+
+if ! id "${user}" > /dev/null 2>&1; then
+    echo "modify-user-ids: user '${user}' does not exist" >&2
+    exit 1
+fi
+
+for value in "${uid}" "${gid}"; do
+    if [[ -n "${value}" && ! "${value}" =~ ^[0-9]+$ ]]; then
+        echo "modify-user-ids: '${value}' is not a numeric id" >&2
+        exit 2
     fi
-}
+done
 
-modifyGroupId() {
+home=$(getent passwd "${user}" | cut -d: -f6)
 
-    if [ $# = 2 ]; then
-        if grep -q "$2" /etc/group; then
-            usermod -g "$2" "$1"
+if [[ -n "${uid}" && "$(id -u "${user}")" != "${uid}" ]]; then
+    # usermod also changes the owner of the files in the home directory
+    usermod -o -u "${uid}" "${user}"
+fi
+
+old_gid=$(id -g "${user}")
+if [[ -n "${gid}" && "${old_gid}" != "${gid}" ]]; then
+    if existing=$(getent group "${gid}"); then
+        echo "modify-user-ids: gid ${gid} already exists as group '${existing%%:*}', using it as primary group of '${user}'" >&2
+        usermod -g "${gid}" "${user}"
+    elif [[ "$(id -gn "${user}")" == "${user}" ]]; then
+        groupmod -g "${gid}" "${user}"
+    else
+        # never renumber a shared group (e.g. after joining dialout before)
+        if getent group "${user}" > /dev/null; then
+            groupmod -g "${gid}" "${user}"
         else
-            groupmod -g "$2" "$1"
+            groupadd -g "${gid}" "${user}"
         fi
+        usermod -g "${gid}" "${user}"
     fi
-}
-
-modifyUserId "$1" "$2"
-
-modifyGroupId "$1" "$3"
+    if [[ -d "${home}" ]]; then
+        find "${home}" -xdev -group "${old_gid}" -exec chgrp -h "${gid}" {} +
+    fi
+fi

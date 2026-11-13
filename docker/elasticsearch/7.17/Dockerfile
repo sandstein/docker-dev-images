@@ -1,4 +1,4 @@
-FROM docker.elastic.co/elasticsearch/elasticsearch:8.6
+FROM docker.elastic.co/elasticsearch/elasticsearch:7.17.8
 
 LABEL de.sandstein.dde="elasticsearch"
 

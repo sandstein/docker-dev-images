@@ -1,195 +1,176 @@
 #!/bin/bash
+#
+# Builds one image family with docker compose and tags it as ${NAMESPACE:-sandstein}/<family>:<tag>.
+#
+#   bin/build.sh <family>                 e.g. bin/build.sh mariadb
+#   bin/build.sh php <cli|fpm> <version>  e.g. bin/build.sh php cli 8.4
+#
+# Must be run from the repository root. Fails (and tags nothing more) as soon
+# as a build fails or a version cannot be determined.
+
+set -o errexit
+set -o nounset
+set -o pipefail
 
 #BUILD_ARGS="--force-rm --pull"
-BUILD_ARGS=""
-PWD=$(pwd)
-PROJECT_NAME=$(basename "${PWD}")
+BUILD_ARGS=()
 
+# target namespace; set NAMESPACE=test to build and tag without touching sandstein/* images
+NAMESPACE=${NAMESPACE:-sandstein}
+
+# fixed project name, so the image names do not depend on the checkout directory
+export COMPOSE_PROJECT_NAME=sandstein-dev-images
+
+# the PHP image that also gets sandstein/php:latest
+PHP_LATEST="cli-8.5"
+
+usage() {
+  cat >&2 <<EOF
+usage: $0 <family>
+       $0 php <cli|fpm> <version>
+
+families: ssh selenium-side-runner apache mariadb mysql elasticsearch node python php
+EOF
+  exit 2
+}
+
+build() {
+  docker compose build "${BUILD_ARGS[@]}" "$1"
+}
+
+# run <service> <command...>: runs a command in the built image without a tty
+run() {
+  docker compose run --rm -T "$@"
+}
+
+# tag <service> <repository> <tag...>
 tag() {
-  for tag in $2
-  do
-    docker tag "${PROJECT_NAME}-$1:latest" "sandstein/$1:$tag"
-  done
-
-}
-
-tag_version() {
-  for tag in $3
-  do
-    docker tag "${PROJECT_NAME}-$1-$2:latest" "sandstein/$1:$tag"
+  local service=$1 repository=$2
+  shift 2
+  for tag in "$@"; do
+    docker tag "${COMPOSE_PROJECT_NAME}-${service}:latest" "${NAMESPACE}/${repository}:${tag}"
   done
 }
 
-tag_php_version() {
-  for tag in $3
-  do
-    docker tag "${PROJECT_NAME}-php-$1-$2" "sandstein/php:$1-$tag"
-  done
-}
-
-get_php_version()  {
-  docker compose run --rm "php-$1-$2" php --version | grep "^PHP" | cut -d " " -f2
-}
-
-get_node_version() {
-  docker compose run --rm node-$1 node -v| grep "^v" | sed "s/v//"
-}
-
-
-get_python_version() {
-  docker compose run --rm python-$1 python -V| grep "^Python " | sed "s/Python //" | sed 's/\r//'
-}
-
-get_mysql_version() {
-  docker compose run --rm "mysql-$1" mysqld --version | cut -d " " -f4
-}
-
-get_percona_version() {
-  docker compose run --rm "percona-$1" mysqld --version | cut -d " " -f4
-}
-
-get_mariadb_version() {
-  major=${1%%.*}
-  minor=${1##*.}
-
-  if (( $major > 11 || ($major == 11 && $minor >= 8) )); then
-    docker compose run --rm "mariadb-$1" mariadbd --version | \
-      grep --only-matching --perl-regexp "\\d+\.\\d+\.\\d+-MariaDB" | \
-      grep --only-matching --perl-regexp "\\d+\.\\d+\.\\d+"  | sed 's/\r//'
-  else
-    docker compose run --rm "mariadb-$1" mysqld --version | \
-      grep --only-matching --perl-regexp "\\d+\.\\d+\.\\d+-MariaDB" | \
-      grep --only-matching --perl-regexp "\\d+\.\\d+\.\\d+"  | sed 's/\r//'
+# version <output>: extracts the first x.y[.z] version number, fails without one
+version() {
+  local found
+  found=$(grep --only-matching --perl-regexp '\d+\.\d+(\.\d+)?' <<< "$1" | head -n1)
+  if [[ -z "${found}" ]]; then
+    echo "could not determine a version from: $1" >&2
+    return 1
   fi
+  echo "${found}"
 }
 
-get_apache_version() {
-  docker compose run --rm "apache-$1" httpd -v | \
-    grep --only-matching --perl-regexp "Apache\/\\d+\.\\d+\.\\d+" | \
-    grep  --only-matching --perl-regexp "\\d+\.\\d+\.\\d+"  | sed 's/\r//'
-}
-
-get_selenium_side_runner_version() {
-  docker compose run --rm selenium-side-runner selenium-side-runner --version | sed 's/\r//'
-}
-
-test() {
-  echo $PROJECT_NAME;
-}
+[[ $# -ge 1 ]] || usage
 
 case $1 in
 
 ssh)
-# ssh (https://hub.docker.com/_/debian)
-docker compose build ${BUILD_ARGS} ssh
-tag "ssh" "11 bullseye latest"
-;;
+  # ssh (https://hub.docker.com/_/debian)
+  build ssh
+  tag ssh ssh 13 trixie latest
+  ;;
 
 selenium-side-runner)
-# selenium-side-runner (https://hub.docker.com/_/node)
-docker compose build ${BUILD_ARGS} selenium-side-runner
-tag selenium-side-runner "$(get_selenium_side_runner_version) 14 latest"
-;;
+  # selenium-side-runner (https://hub.docker.com/_/node)
+  build selenium-side-runner
+  v=$(version "$(run selenium-side-runner selenium-side-runner --version)")
+  tag selenium-side-runner selenium-side-runner "${v}" 24 latest
+  ;;
 
 apache)
-# apache (https://hub.docker.com/_/httpd)
-docker compose build ${BUILD_ARGS} apache-2.4
-tag_version "apache" "2.4" "2.4 $(get_apache_version 2.4) latest"
-;;
+  # apache (https://hub.docker.com/_/httpd)
+  build apache-2.4
+  v=$(version "$(run apache-2.4 httpd -v | grep '^Server version')")
+  tag apache-2.4 apache 2.4 "${v}" latest
+  ;;
 
 mariadb)
-# mariadb (https://hub.docker.com/_/mariadb)
-for version in 10.2 10.3 10.4 10.5 10.6 10.7 11.4 11.8
-do
-  docker compose build ${BUILD_ARGS} "mariadb-$version"
-done
-tag_version "mariadb" "10.2" "10.2 $(get_mariadb_version 10.2)"
-tag_version "mariadb" "10.3" "10.3 $(get_mariadb_version 10.3)"
-tag_version "mariadb" "10.4" "10.4 $(get_mariadb_version 10.4)"
-tag_version "mariadb" "10.5" "10.5 $(get_mariadb_version 10.5)"
-tag_version "mariadb" "10.6" "10.6 $(get_mariadb_version 10.6)"
-tag_version "mariadb" "10.7" "10.7 $(get_mariadb_version 10.7)"
-tag_version "mariadb" "11.4" "11.4 $(get_mariadb_version 11.4)"
-tag_version "mariadb" "11.8" "11.8 $(get_mariadb_version 11.8) latest"
-;;
+  # mariadb (https://hub.docker.com/_/mariadb)
+  # frozen (EOL, not rebuilt): 10.2 10.3 10.4 10.5 10.6 10.7
+  for minor in 11.4 11.8; do
+    build "mariadb-${minor}"
+    v=$(version "$(run "mariadb-${minor}" mariadbd --version)")
+    tags=("${minor}" "${v}")
+    [[ ${minor} == 11.8 ]] && tags+=(latest)
+    tag "mariadb-${minor}" mariadb "${tags[@]}"
+  done
+  ;;
 
 mysql)
-# mysql (https://hub.docker.com/_/mysql)
-for version in 5.7 8.0 8.4
-do
-  docker compose build ${BUILD_ARGS} "mysql-$version"
-done
-tag_version "mysql" "5.7" "5.7  $(get_mysql_version 5.7)"
-tag_version "mysql" "8.0" "8.0  $(get_mysql_version 8.0)"
-tag_version "mysql" "8.4" "8.4  $(get_mysql_version 8.4) latest"
-;;
-
-percona)
-# percona (https://hub.docker.com/r/percona/percona-server)
-for version in 5.7 8.0
-do
-  docker compose build ${BUILD_ARGS} "percona-$version"
-done
-tag_version "percona" "5.7" "5.7  $(get_percona_version 5.7)"
-tag_version "percona" "8.0" "8.0 $(get_percona_version 5.7) latest"
-;;
+  # mysql (https://hub.docker.com/_/mysql)
+  # frozen (EOL, not rebuilt): 5.7 8.0
+  # shellcheck disable=SC2043 # one maintained version for now
+  for minor in 8.4; do
+    build "mysql-${minor}"
+    v=$(version "$(run "mysql-${minor}" mysqld --version)")
+    tags=("${minor}" "${v}")
+    [[ ${minor} == 8.4 ]] && tags+=(latest)
+    tag "mysql-${minor}" mysql "${tags[@]}"
+  done
+  ;;
 
 php)
-# php (cli and fpm) (https://hub.docker.com/_/php/)
-type=$2
-version=$3
-target="php-$type-$version"
-docker compose build ${BUILD_ARGS} $target
-tag_php_version $type $version "$version $(get_php_version "$type" $version)"
-tag_version "php" "$type-$version" "latest"
-;;
+  # php (cli and fpm) (https://hub.docker.com/_/php/)
+  [[ $# -eq 3 ]] || usage
+  type=$2
+  minor=$3
+  [[ ${type} == cli || ${type} == fpm ]] || usage
+  service="php-${type}-${minor}"
+  build "${service}"
+  v=$(version "$(run "${service}" php -r 'echo PHP_VERSION;')")
+  if [[ ${v} != "${minor}".* ]]; then
+    echo "${service} contains PHP ${v}, expected ${minor}.x" >&2
+    exit 1
+  fi
+  tags=("${type}-${minor}" "${type}-${v}")
+  [[ "${type}-${minor}" == "${PHP_LATEST}" ]] && tags+=(latest)
+  tag "${service}" php "${tags[@]}"
+  ;;
 
 elasticsearch)
-for version in 5.6 6.4 6.8 7.1 7.3 7.6 7.10 7.16 7.17 8.6
-do
-  docker compose build ${BUILD_ARGS} elasticsearch-${version}
-done
-tag_version "elasticsearch" "5.6" "5 5.6 5.6.16"
-tag_version "elasticsearch" "6.4" "6.4 6.4.3"
-tag_version "elasticsearch" "6.8" "6 6.8 6.8.23"
-tag_version "elasticsearch" "7.1" "7.1 7.1.1"
-tag_version "elasticsearch" "7.3" "7.3 7.3.2"
-tag_version "elasticsearch" "7.6" "7.6 7.6.2"
-tag_version "elasticsearch" "7.10" "7.10 7.10.1"
-tag_version "elasticsearch" "7.16" "7.16 7.16.3"
-tag_version "elasticsearch" "7.17" "7 7.17 7.17.8"
-tag_version "elasticsearch" "8.6" "8 8.6 8.6.2 latest"
-;;
+  # elasticsearch (https://www.docker.elastic.co/r/elasticsearch), versions are fixed;
+  # all are frozen, CI builds them only with BUILD_TARGET=elasticsearch
+  for minor in 5.6 6.4 6.8 7.1 7.3 7.6 7.10 7.16 7.17 8.6; do
+    build "elasticsearch-${minor}"
+  done
+  tag elasticsearch-5.6 elasticsearch 5 5.6 5.6.16
+  tag elasticsearch-6.4 elasticsearch 6.4 6.4.3
+  tag elasticsearch-6.8 elasticsearch 6 6.8 6.8.23
+  tag elasticsearch-7.1 elasticsearch 7.1 7.1.1
+  tag elasticsearch-7.3 elasticsearch 7.3 7.3.2
+  tag elasticsearch-7.6 elasticsearch 7.6 7.6.2
+  tag elasticsearch-7.10 elasticsearch 7.10 7.10.1
+  tag elasticsearch-7.16 elasticsearch 7.16 7.16.3
+  tag elasticsearch-7.17 elasticsearch 7 7.17 7.17.8
+  tag elasticsearch-8.6 elasticsearch 8 8.6 8.6.2 latest
+  ;;
 
 node)
-for version in 11 12 14 16 17 18
-do
-  docker compose build ${BUILD_ARGS} node-${version}
-  if [ ${version} == "18" ]; then
-    tag_version "node" $version "$version $(get_node_version "$version") latest"
-  else
-    tag_version "node" $version "$version $(get_node_version "$version")"
-  fi
-done
-;;
+  # node (https://hub.docker.com/_/node)
+  for major in 22 24 26; do
+    build "node-${major}"
+    v=$(version "$(run "node-${major}" node -v)")
+    if [[ ${v} != "${major}".* ]]; then
+      echo "node-${major} contains node ${v}" >&2
+      exit 1
+    fi
+    tags=("${major}" "${v}")
+    [[ ${major} == 26 ]] && tags+=(latest)
+    tag "node-${major}" node "${tags[@]}"
+  done
+  ;;
 
 python)
-for version in 3.10
-do
-  docker compose build ${BUILD_ARGS} python-${version}
-  tag_version "python" $version "$version $(get_python_version "$version") latest"
-done
-;;
-
-solr)
-for version in 7.7 8.9
-do
-  docker compose build ${BUILD_ARGS} solr-${version}
-done
-tag_version "solr" "7.7" "7.7 7.7.3"
-tag_version "solr" "8.9" "8.9 8.9.0 latest"
-;;
+  # python (https://hub.docker.com/_/python)
+  build python-3.10
+  v=$(version "$(run python-3.10 python -V)")
+  tag python-3.10 python 3.10 "${v}" latest
+  ;;
 
 *)
-  test
+  usage
+  ;;
 esac

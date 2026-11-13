@@ -116,7 +116,7 @@ services:
       dockerfile: docker/php-cli/8.4/Dockerfile
     tty: true
   #
-  # latest php 8.4
+  # latest php 8.5
   #
   php-fpm-8.5:
     container_name: php-fpm-8.5
@@ -130,17 +130,6 @@ services:
       context: .
       dockerfile: docker/php-cli/8.5/Dockerfile
     tty: true
-
-  #
-  # mysql 5.5.62
-  #
-  mysql-5.5:
-      container_name: mysql-5.5
-      environment:
-        - MYSQL_ALLOW_EMPTY_PASSWORD=true
-      build:
-        context: .
-        dockerfile: docker/mysql/5.5/Dockerfile
 
   #
   # mysql 5.7.25
@@ -293,7 +282,7 @@ services:
     container_name: elasticsearch-7.6
     build:
       context: .
-      dockerfile: docker/elasticsearch/7.3/Dockerfile
+      dockerfile: docker/elasticsearch/7.6/Dockerfile
 
   elasticsearch-7.10:
     container_name: elasticsearch-7.10
@@ -311,7 +300,7 @@ services:
     container_name: elasticsearch-7.17
     build:
       context: .
-      dockerfile: docker/elasticsearch/7.16/Dockerfile
+      dockerfile: docker/elasticsearch/7.17/Dockerfile
 
   elasticsearch-8.6:
     container_name: elasticsearch-8.6
@@ -319,41 +308,23 @@ services:
       context: .
       dockerfile: docker/elasticsearch/8.6/Dockerfile
 
-  node-11:
-    container_name: node-11
+  node-22:
+    container_name: node-22
     build:
       context: .
-      dockerfile: docker/node/11/Dockerfile
+      dockerfile: docker/node/22/Dockerfile
 
-  node-12:
-    container_name: node-12
+  node-24:
+    container_name: node-24
     build:
       context: .
-      dockerfile: docker/node/16/Dockerfile
+      dockerfile: docker/node/24/Dockerfile
 
-  node-14:
-    container_name: node-14
+  node-26:
+    container_name: node-26
     build:
       context: .
-      dockerfile: docker/node/16/Dockerfile
-
-  node-16:
-    container_name: node-16
-    build:
-      context: .
-      dockerfile: docker/node/16/Dockerfile
-
-  node-17:
-    container_name: node-17
-    build:
-      context: .
-      dockerfile: docker/node/17/Dockerfile
-
-  node-18:
-    container_name: node-18
-    build:
-      context: .
-      dockerfile: docker/node/18/Dockerfile
+      dockerfile: docker/node/26/Dockerfile
 
   python-3.10:
     container_name: python-3.10

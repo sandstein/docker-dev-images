@@ -1,0 +1,18 @@
+#!/bin/bash
+#
+# Entrypoint wrapper for Elasticsearch 8+ images.
+#
+# Elasticsearch 8 refuses to run as root, and its docker-entrypoint.sh no longer
+# drops privileges itself (7.x did). The sandstein image therefore stays root,
+# so derived images can run `modify-user-ids elasticsearch <uid> <gid>`, and this
+# wrapper starts Elasticsearch as the (possibly renumbered) elasticsearch user.
+
+set -o nounset
+set -o errexit
+
+if [[ "$(id -u)" == "0" ]]; then
+    exec setpriv --reuid=elasticsearch --regid="$(id -g elasticsearch)" --init-groups \
+        /usr/local/bin/docker-entrypoint.sh "$@"
+fi
+
+exec /usr/local/bin/docker-entrypoint.sh "$@"
