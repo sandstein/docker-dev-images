@@ -44,7 +44,6 @@ RUN set -x \
       gd \
       geospatial \
       gettext \
-      gmagick \
       gnupg \
       grpc \
       imagick \
@@ -53,7 +52,6 @@ RUN set -x \
       ldap \
       lzf \
       mailparse \
-      memcache \
       memcached \
       mongodb \
       mysqli \
