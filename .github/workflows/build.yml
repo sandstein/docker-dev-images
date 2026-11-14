@@ -7,17 +7,15 @@
 # - Publishing pushes the per-arch images to GHCR as staging (<tag>-amd64 / <tag>-arm64),
 #   then the publish job creates sandstein/<repo>:<tag> from both. Both arches must yield
 #   the same tag list, otherwise nothing is published for that job.
-# - Branch pushes and pull requests only build. Publishing happens on the weekly schedule
-#   and on manual runs with "publish" checked (needs the DOCKERHUB_USERNAME and
+# - Pushing a tag only builds (branch pushes start nothing). Publishing happens on the weekly
+#   schedule and on manual runs with "publish" checked (needs the DOCKERHUB_USERNAME and
 #   DOCKERHUB_TOKEN secrets).
 
 name: build
 
 on:
   push:
-    branches: ['**']
-    paths-ignore: ['**.md']
-  pull_request:
+    tags: ['*']
   schedule:
     - cron: '12 16 * * 0' # Sundays 16:12 UTC; scheduled runs only use the default branch
   workflow_dispatch:
@@ -31,8 +29,9 @@ on:
         type: string
         default: ''
 
+# a newer tag cancels the build of an older one (e.g. two tags pushed at once)
 concurrency:
-  group: ${{ github.workflow }}-${{ github.ref }}
+  group: ${{ github.workflow }}-${{ github.ref_type == 'tag' && 'tags' || github.ref }}
   cancel-in-progress: true
 
 permissions:
