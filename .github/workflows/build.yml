@@ -7,9 +7,9 @@
 # - Publishing pushes the per-arch images to GHCR as staging (<tag>-amd64 / <tag>-arm64),
 #   then the publish job creates sandstein/<repo>:<tag> from both. Both arches must yield
 #   the same tag list, otherwise nothing is published for that job.
-# - Pushing a tag only builds (branch pushes start nothing). Publishing happens on the weekly
-#   schedule and on manual runs with "publish" checked (needs the DOCKERHUB_USERNAME and
-#   DOCKERHUB_TOKEN secrets).
+# - Publishing happens when a tag is pushed, on the weekly schedule and on manual runs with
+#   "publish" checked (needs the DOCKERHUB_USERNAME and DOCKERHUB_TOKEN secrets). Manual runs
+#   without "publish" only build. Branch pushes start nothing.
 
 name: build
 
@@ -38,7 +38,7 @@ permissions:
   contents: read
 
 env:
-  PUBLISH: ${{ github.event_name == 'schedule' || (github.event_name == 'workflow_dispatch' && inputs.publish) }}
+  PUBLISH: ${{ github.event_name == 'push' || github.event_name == 'schedule' || (github.event_name == 'workflow_dispatch' && inputs.publish) }}
   STAGING: ghcr.io/${{ github.repository_owner }}/dev-images-staging
 
 jobs:
@@ -132,7 +132,8 @@ jobs:
   publish:
     name: publish ${{ matrix.target.name }}
     needs: [targets, build]
-    if: always() && needs.targets.result == 'success' && (github.event_name == 'schedule' || (github.event_name == 'workflow_dispatch' && inputs.publish))
+    # same condition as env.PUBLISH (env is not available in a job-level if)
+    if: always() && needs.targets.result == 'success' && (github.event_name == 'push' || github.event_name == 'schedule' || (github.event_name == 'workflow_dispatch' && inputs.publish))
     runs-on: ubuntu-24.04
     permissions:
       contents: read
