@@ -15,7 +15,7 @@ name: build
 on:
   push:
     branches: ['**']
-    paths-ignore: ['**.md', '.gitlab-ci.yml']
+    paths-ignore: ['**.md']
   pull_request:
   schedule:
     - cron: '12 16 * * 0' # Sundays 16:12 UTC; scheduled runs only use the default branch

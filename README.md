@@ -53,11 +53,11 @@ Removes the local images of a container type (by their `de.sandstein.dde` label)
 $ bin/cleanup.sh <container>
 ```
 
-### .gitlab-ci.yml
-To automatize the push of the latest versions there is a Gitlab-CI configuration which regularly builds the
-docker containers and pushes them to dockerhub. A pipeline schedule with `BUILD_ALL=true` rebuilds everything,
-`BUILD_TARGET=<container>` (e.g. `mariadb` or `php-cli-8.4`) builds a single job.
-For now sandstein's own gitlab instance is used to do so, we might change this to some GitHub Actions in the future.
+### GitHub Actions
+`.github/workflows/build.yml` builds the maintained images natively for `linux/amd64` and `linux/arm64`.
+Pushes and pull requests only build. The weekly schedule (Sundays 16:12 UTC) and manual runs with *publish* checked
+push multi-arch images to Docker Hub (repository secrets `DOCKERHUB_USERNAME` and `DOCKERHUB_TOKEN`). A manual run
+can also build a single target (e.g. `mariadb` or `php-cli-8.4`).
 
 ## Changing user and group IDs
 

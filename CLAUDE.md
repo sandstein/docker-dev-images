@@ -64,19 +64,14 @@ Touch all of these, they are not generated from each other:
 1. `docker/<family>/<version>/Dockerfile`
 2. a service in `docker-compose.yml`
 3. the version loop and tag lines in `bin/build.sh` (move `latest` if it becomes the newest)
-4. a job in `.gitlab-ci.yml` (PHP: one `build-php-<type>-<version>` job per type/version)
+4. the `targets` list in `.github/workflows/build.yml` (PHP: one `php-<type>-<version>` entry per type/version)
 5. the version list in `README.md`
 
 ## CI
 
-`.gitlab-ci.yml` runs on Sandstein's GitLab (runner tag `devimages`). Jobs are triggered by pipeline variables:
-`BUILD_TARGET=<target>` (e.g. `mariadb`, `php-cli-8.4`) builds one job, `BUILD_ALL=true` builds everything. Each job
-runs build → push → cleanup.
-
-### GitHub Actions (multi-arch, trial)
-
-`.github/workflows/build.yml` on the public mirror `github` (git@github.com:sandstein/docker-dev-images.git, default
-branch `master`) builds the maintained targets natively on amd64 and arm64 runners via `bin/build.sh`. Branch pushes
-and PRs only build; the weekly schedule and manual runs with `publish` push per-arch staging images to GHCR and merge
-them into `sandstein/<repo>:<tag>` on Docker Hub (secrets `DOCKERHUB_USERNAME`, `DOCKERHUB_TOKEN`). The target list
-lives in the workflow's `targets` job; keep it in sync with `build.sh`.
+`.github/workflows/build.yml` runs on the public GitHub mirror (remote `github`,
+git@github.com:sandstein/docker-dev-images.git) and builds the maintained targets natively on amd64 and arm64 runners
+via the unchanged `bin/build.sh`. Branch pushes and PRs only build; the weekly schedule (Sundays 16:12 UTC, default
+branch only) and manual runs with `publish` push per-arch staging images to GHCR and merge them into
+`sandstein/<repo>:<tag>` on Docker Hub (secrets `DOCKERHUB_USERNAME`, `DOCKERHUB_TOKEN`), only if both arches yield the
+same tag list. A manual run can build one target. GitLab CI and its schedules were removed (2026-11-14).
