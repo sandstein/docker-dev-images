@@ -1,0 +1,178 @@
+# Builds the maintained image families natively on amd64 and arm64 runners and,
+# when publishing, merges both into multi-arch manifests on Docker Hub.
+#
+# - Each (target, arch) job runs bin/build.sh unchanged, so tag discovery stays in one place.
+# - Publishing pushes the per-arch images to GHCR as staging (<tag>-amd64 / <tag>-arm64),
+#   then the merge job creates sandstein/<repo>:<tag> from both. Both arches must yield
+#   the same tag list, otherwise nothing is published for that target.
+# - Branch pushes and pull requests only build. Publishing happens on the weekly schedule
+#   and on manual runs with "publish" checked (needs the DOCKERHUB_USERNAME and
+#   DOCKERHUB_TOKEN secrets).
+# - Frozen EOL versions (PHP <= 8.1, MariaDB 10.x, MySQL 5.7/8.0, Elasticsearch) are not built.
+
+name: build
+
+on:
+  push:
+    branches: ['**']
+    paths-ignore: ['**.md']
+  pull_request:
+  schedule:
+    - cron: '12 16 * * 0' # Sundays 16:12 UTC; scheduled runs only use the default branch
+  workflow_dispatch:
+    inputs:
+      publish:
+        description: Push the multi-arch images to Docker Hub
+        type: boolean
+        default: false
+      target:
+        description: Only build this target (e.g. php-cli-8.4, mariadb); empty builds all
+        type: string
+        default: ''
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+env:
+  PUBLISH: ${{ github.event_name == 'schedule' || (github.event_name == 'workflow_dispatch' && inputs.publish) }}
+  STAGING: ghcr.io/${{ github.repository_owner }}/dev-images-staging
+
+jobs:
+  targets:
+    runs-on: ubuntu-24.04
+    outputs:
+      matrix: ${{ steps.filter.outputs.matrix }}
+    steps:
+      - name: Select targets
+        id: filter
+        env:
+          WANTED: ${{ inputs.target }}
+        run: |
+          all='[
+            {"name":"ssh","repo":"ssh","args":"ssh"},
+            {"name":"selenium-side-runner","repo":"selenium-side-runner","args":"selenium-side-runner"},
+            {"name":"apache","repo":"apache","args":"apache"},
+            {"name":"mariadb","repo":"mariadb","args":"mariadb"},
+            {"name":"mysql","repo":"mysql","args":"mysql"},
+            {"name":"node","repo":"node","args":"node"},
+            {"name":"python","repo":"python","args":"python"},
+            {"name":"php-cli-8.2","repo":"php","args":"php cli 8.2"},
+            {"name":"php-cli-8.3","repo":"php","args":"php cli 8.3"},
+            {"name":"php-cli-8.4","repo":"php","args":"php cli 8.4"},
+            {"name":"php-cli-8.5","repo":"php","args":"php cli 8.5"},
+            {"name":"php-fpm-8.2","repo":"php","args":"php fpm 8.2"},
+            {"name":"php-fpm-8.3","repo":"php","args":"php fpm 8.3"},
+            {"name":"php-fpm-8.4","repo":"php","args":"php fpm 8.4"},
+            {"name":"php-fpm-8.5","repo":"php","args":"php fpm 8.5"}
+          ]'
+          matrix=$(jq -c --arg w "${WANTED:-}" 'map(select($w == "" or .name == $w))' <<< "$all")
+          if [[ $matrix == "[]" ]]; then echo "::error::unknown target ${WANTED}"; exit 1; fi
+          echo "matrix=${matrix}" >> "$GITHUB_OUTPUT"
+
+  build:
+    name: ${{ matrix.target.name }} (${{ matrix.arch.name }})
+    needs: targets
+    runs-on: ${{ matrix.arch.runner }}
+    permissions:
+      contents: read
+      packages: write
+    strategy:
+      fail-fast: false
+      matrix:
+        arch:
+          - { name: amd64, runner: ubuntu-24.04 }
+          - { name: arm64, runner: ubuntu-24.04-arm }
+        target: ${{ fromJSON(needs.targets.outputs.matrix) }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Build
+        env:
+          NAMESPACE: sandstein
+          ARGS: ${{ matrix.target.args }}
+        run: |
+          # shellcheck disable=SC2086 # ARGS is intentionally split
+          bin/build.sh ${ARGS}
+
+      - name: List tags
+        run: |
+          docker image ls "sandstein/${{ matrix.target.repo }}" --format '{{.Tag}}' | sort > tags.txt
+          test -s tags.txt
+          echo "### ${{ matrix.target.name }} (${{ matrix.arch.name }})" >> "$GITHUB_STEP_SUMMARY"
+          sed 's/^/- /' tags.txt >> "$GITHUB_STEP_SUMMARY"
+          cat tags.txt
+
+      - name: Log in to GHCR
+        if: env.PUBLISH == 'true'
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Push staging images
+        if: env.PUBLISH == 'true'
+        run: |
+          while read -r tag; do
+            staging="${STAGING}/${{ matrix.target.repo }}:${tag}-${{ matrix.arch.name }}"
+            docker tag "sandstein/${{ matrix.target.repo }}:${tag}" "${staging}"
+            docker push --quiet "${staging}"
+          done < tags.txt
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: tags-${{ matrix.target.name }}-${{ matrix.arch.name }}
+          path: tags.txt
+
+  publish:
+    name: publish ${{ matrix.target.name }}
+    needs: [targets, build]
+    if: always() && needs.targets.result == 'success' && (github.event_name == 'schedule' || (github.event_name == 'workflow_dispatch' && inputs.publish))
+    runs-on: ubuntu-24.04
+    permissions:
+      contents: read
+      packages: read
+    strategy:
+      fail-fast: false
+      matrix:
+        target: ${{ fromJSON(needs.targets.outputs.matrix) }}
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          pattern: tags-${{ matrix.target.name }}-*
+          path: tags
+
+      - name: Check that both arches built the same tags
+        run: |
+          for arch in amd64 arm64; do
+            test -s "tags/tags-${{ matrix.target.name }}-${arch}/tags.txt" || { echo "::error::no ${arch} build for ${{ matrix.target.name }}"; exit 1; }
+          done
+          diff -u "tags/tags-${{ matrix.target.name }}-amd64/tags.txt" "tags/tags-${{ matrix.target.name }}-arm64/tags.txt"
+
+      - uses: docker/setup-buildx-action@v3
+
+      - uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      - name: Create multi-arch manifests on Docker Hub
+        run: |
+          repo="${{ matrix.target.repo }}"
+          while read -r tag; do
+            docker buildx imagetools create \
+              --tag "docker.io/sandstein/${repo}:${tag}" \
+              "${STAGING}/${repo}:${tag}-amd64" \
+              "${STAGING}/${repo}:${tag}-arm64"
+            echo "sandstein/${repo}:${tag}" >> "$GITHUB_STEP_SUMMARY"
+          done < "tags/tags-${{ matrix.target.name }}-amd64/tags.txt"
