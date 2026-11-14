@@ -10,26 +10,37 @@ Also, there is a script added to change the user ID and group ID of the default 
 dev environment you can change the user ID and group ID to your private one, so your working directory will not get polluted by
 files belonging to other users.
 
+## Image catalog
+
+All maintained versions are listed in [`docker-bake.hcl`](docker-bake.hcl), the only place where versions are
+defined. Each image family has one Dockerfile in `docker/<family>/Dockerfile` that gets the version as build
+argument. Show all targets with their tags:
+```shell
+$ docker buildx bake --print
+```
+Targets are named after family and version with `-` instead of `.`, e.g. `php-cli-8-4`, `php-fpm-8-4-prod`,
+`mariadb-11-8`. Every matrix (e.g. `php`, `node`) is also a group.
+
+### Adding a version
+Add the version to its list in `docker-bake.hcl`, e.g. `"8.6" = { all = "", cli = "" }` to `PHP` or `"12.0"` to
+`MARIADB`. The last entry of a list gets the `latest` tag (for PHP: `PHP_LATEST`). Then mention the version below.
+CI picks up new targets from the catalog by itself.
+
+Removing a version from the catalog freezes it: its images stay on Docker Hub but are not rebuilt.
+
 ## Scripts
 
-The project contains three scripts: one for building the different containers, one for pushing them to docker hub and
-one for cleaning up afterwards. Run them from the repository root.
+Run the scripts from the repository root.
 
 ### build.sh
-To locally build one or all containers of a specific variety use
+Builds catalog targets or groups for the local platform, adds the patch-level tags and checks that every image
+contains the version the catalog asks for:
 ```shell
-$ bin/build.sh <container>
+$ bin/build.sh                       # all maintained images
+$ bin/build.sh php                   # a group
+$ bin/build.sh php-cli-8-4 node-24   # single targets
 ```
-where the container is one of the container names written down below. This builds and tags
-all variants of the container type except for php, where you have to use
-```shell
-$ bin/build.sh php <type> <version>
-```
-which will build the fpm or cli type of the latest patch version of version, eg.:
-```shell
-$ bin/build.sh php cli 8.4
-```
-builds and tags `sandstein/php:cli-8.4` and `sandstein/php:cli-8.4.<patch>`.
+e.g. `php-cli-8-4` is tagged `sandstein/php:cli-8.4` and `sandstein/php:cli-8.4.<patch>`.
 
 The script stops at the first failing build or version check. To try a build without overwriting your local
 `sandstein/*` images, set another namespace:
@@ -53,11 +64,11 @@ Removes the local images of a container type (by their `de.sandstein.dde` label)
 $ bin/cleanup.sh <container>
 ```
 
-### .gitlab-ci.yml
-To automatize the push of the latest versions there is a Gitlab-CI configuration which regularly builds the
-docker containers and pushes them to dockerhub. A pipeline schedule with `BUILD_ALL=true` rebuilds everything,
-`BUILD_TARGET=<container>` (e.g. `mariadb` or `php-cli-8.4`) builds a single job.
-For now sandstein's own gitlab instance is used to do so, we might change this to some GitHub Actions in the future.
+### GitHub Actions
+`.github/workflows/build.yml` builds all catalog targets natively for `linux/amd64` and `linux/arm64`.
+Pushes and pull requests only build. The weekly schedule (Sundays 16:12 UTC) and manual runs with *publish* checked
+push multi-arch images to Docker Hub (repository secrets `DOCKERHUB_USERNAME` and `DOCKERHUB_TOKEN`). A manual run
+can also build a single target or group (e.g. `mariadb` or `php-cli-8-4`).
 
 ## Changing user and group IDs
 
@@ -86,7 +97,8 @@ RUN modify-user-ids www-data ${USER_ID} ${GROUP_ID}
 in your Dockerfile to run it as your current user.
 
 ### elasticsearch
-Versions 5.6, 6.4, 6.8, 7.1, 7.3, 7.6, 7.10, 7.16, 7.17 and 8.6 are prepared. Use
+Not built anymore. The images for versions 5.6, 6.4, 6.8, 7.1, 7.3, 7.6, 7.10, 7.16, 7.17 and 8.6 stay on Docker Hub
+(sources: tag `26.11.13`). Use
 
 ```dockerfile
 ARG USER_ID=1000
@@ -107,7 +119,7 @@ Before November 2026 some tags contained other versions: `7.6` was 7.3.2, `7.17`
 
 ### mariadb
 
-Versions 10.2 to 10.7, 11.4 and 11.8 are prepared. Use
+Versions 11.4 and 11.8 are built; the images for 10.2 to 10.7 stay on Docker Hub but are not rebuilt. Use
 
 ```dockerfile
 ARG USER_ID=999
@@ -118,7 +130,7 @@ for user customisation.
 
 ### mysql
 
-Versions 5.7, 8.0 and 8.4 are prepared. Use
+Version 8.4 is built; the images for 5.7 and 8.0 stay on Docker Hub but are not rebuilt. Use
 
 ```dockerfile
 ARG USER_ID=999
@@ -140,7 +152,14 @@ for user customisation. The old images for node 11 to 18 stay on Docker Hub but 
 (`node:12` and `node:14` contained node 16).
 
 ### php
-A collection of all major PHP versions (from 7.3 to 8.5) as fpm and cli. Use
+PHP 8.2 to 8.5 as fpm and cli, each in two variants:
+
+- `sandstein/php:<type>-<version>` (e.g. `fpm-8.4`): development image with xdebug and xhprof, the cli images also
+  with node and npm.
+- `sandstein/php:<type>-<version>-prod` (e.g. `fpm-8.4-prod`): without xdebug, xhprof and node, with PHP's
+  `php.ini-production`.
+
+The images for 7.3 to 8.1 stay on Docker Hub but are not rebuilt. Use
 
 ```dockerfile
 ARG USER_ID=33
@@ -155,10 +174,11 @@ ARG USER_ID=1000
 ARG GROUP_ID=1000
 RUN modify-user-ids phpcli ${USER_ID} ${GROUP_ID}
 ```
-for the cli containers. `sandstein/php:latest` is the newest cli image.
+for the cli containers. `sandstein/php:latest` is the newest cli development image.
 
 #### php modules
-The containers try to include all available modules. When using the containers, you can disable
+The containers try to include all available modules. The common list is in `docker/php/Dockerfile`, version
+specific additions are in `docker-bake.hcl`. When using the containers, you can disable
 the modules in your config, e.g. with `disable-php-modules xdebug,xhprof`. If you miss something just add a PR,
 most of the modules are built with 
 [Docker PHP-Extension Installer](https://github.com/mlocati/docker-php-extension-installer), so if a module can be
@@ -189,4 +209,4 @@ See especially the [docker-compose.yml](https://github.com/sandstein/docker-dev-
 in [Docker Development Environment](https://github.com/sandstein/docker-dev-environment) for more details.
 
 ### No longer built
-`percona` (5.7, 8.0) and `solr` (7.7, 8.9) are not built anymore. Their last images stay available on Docker Hub.
+`elasticsearch`, `percona` (5.7, 8.0) and `solr` (7.7, 8.9) are not built anymore. Their last images stay available on Docker Hub.

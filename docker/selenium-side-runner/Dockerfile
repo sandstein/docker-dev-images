@@ -1,32 +1,11 @@
-FROM node:24-trixie-slim
+# the image is tagged with the selenium-side-runner version; NODE_VERSION only picks the base image
+ARG NODE_VERSION=24
+FROM node:${NODE_VERSION}-trixie-slim
 
 LABEL de.sandstein.dde="selenium-side-runner"
 
 COPY files/usr/local/bin /usr/local/bin
 
-RUN set -x \
-    && apt-update \
-    && apt-install \
-        apt-transport-https \
-        ca-certificates \
-        locales \
-        gnupg \
-        procps \
-        wget \
-        curl \
-        vim \
-        net-tools \
-        tzdata \
-        zip \
-        unzip \
-        bzip2 \
-        moreutils \
-        dnsutils \
-        openssh-client \
-        rsync \
-        git \
-        patch \
-    && /usr/local/bin/generate-locales \
-    && docker-image-cleanup
+RUN install-dev-tools
 
 RUN npm install -g selenium-side-runner

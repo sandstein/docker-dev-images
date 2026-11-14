@@ -1,0 +1,169 @@
+# Builds the maintained image families natively on amd64 and arm64 runners and,
+# when publishing, merges both into multi-arch manifests on Docker Hub.
+#
+# - The targets come from the catalog (docker-bake.hcl). A PHP target and its -prod variant
+#   share one job, so the common stages are built only once.
+# - Each (job, arch) runs bin/build.sh, so tagging and version checks stay in one place.
+# - Publishing pushes the per-arch images to GHCR as staging (<tag>-amd64 / <tag>-arm64),
+#   then the publish job creates sandstein/<repo>:<tag> from both. Both arches must yield
+#   the same tag list, otherwise nothing is published for that job.
+# - Branch pushes and pull requests only build. Publishing happens on the weekly schedule
+#   and on manual runs with "publish" checked (needs the DOCKERHUB_USERNAME and
+#   DOCKERHUB_TOKEN secrets).
+
+name: build
+
+on:
+  push:
+    branches: ['**']
+    paths-ignore: ['**.md']
+  pull_request:
+  schedule:
+    - cron: '12 16 * * 0' # Sundays 16:12 UTC; scheduled runs only use the default branch
+  workflow_dispatch:
+    inputs:
+      publish:
+        description: Push the multi-arch images to Docker Hub
+        type: boolean
+        default: false
+      target:
+        description: Only build this bake target or group (e.g. php-cli-8-4, php, mariadb); empty builds all
+        type: string
+        default: ''
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+env:
+  PUBLISH: ${{ github.event_name == 'schedule' || (github.event_name == 'workflow_dispatch' && inputs.publish) }}
+  STAGING: ghcr.io/${{ github.repository_owner }}/dev-images-staging
+
+jobs:
+  targets:
+    runs-on: ubuntu-24.04
+    outputs:
+      matrix: ${{ steps.filter.outputs.matrix }}
+    steps:
+      - uses: actions/checkout@v5
+
+      - name: Select targets
+        id: filter
+        env:
+          WANTED: ${{ inputs.target }}
+        run: |
+          # [{"name":"php-cli-8-5","targets":"php-cli-8-5 php-cli-8-5-prod"}, ...]
+          matrix=$(docker buildx bake --print "${WANTED:-default}" 2>/dev/null \
+            | jq -c '.target | keys | group_by(sub("-prod$"; ""))
+                     | map({name: (.[0] | sub("-prod$"; "")), targets: join(" ")})')
+          if [[ -z $matrix || $matrix == "[]" ]]; then echo "::error::unknown target ${WANTED}"; exit 1; fi
+          echo "matrix=${matrix}" >> "$GITHUB_OUTPUT"
+          jq . <<< "$matrix"
+
+  build:
+    name: ${{ matrix.target.name }} (${{ matrix.arch.name }})
+    needs: targets
+    runs-on: ${{ matrix.arch.runner }}
+    permissions:
+      contents: read
+      packages: write
+    strategy:
+      fail-fast: false
+      matrix:
+        arch:
+          - { name: amd64, runner: ubuntu-24.04 }
+          - { name: arm64, runner: ubuntu-24.04-arm }
+        target: ${{ fromJSON(needs.targets.outputs.matrix) }}
+    steps:
+      - uses: actions/checkout@v5
+
+      - name: Build
+        env:
+          NAMESPACE: sandstein
+          TAGS_FILE: tags.txt
+          TARGETS: ${{ matrix.target.targets }}
+        run: |
+          # shellcheck disable=SC2086 # TARGETS is intentionally split
+          bin/build.sh ${TARGETS}
+
+      - name: List tags
+        run: |
+          sort -o tags.txt tags.txt
+          test -s tags.txt
+          echo "### ${{ matrix.target.name }} (${{ matrix.arch.name }})" >> "$GITHUB_STEP_SUMMARY"
+          sed 's/^/- /' tags.txt >> "$GITHUB_STEP_SUMMARY"
+          cat tags.txt
+
+      - name: Log in to GHCR
+        if: env.PUBLISH == 'true'
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Push staging images
+        if: env.PUBLISH == 'true'
+        run: |
+          # sandstein/php:cli-8.4 -> ghcr.io/<owner>/dev-images-staging/php:cli-8.4-amd64
+          while read -r ref; do
+            staging="${STAGING}/${ref#*/}-${{ matrix.arch.name }}"
+            docker tag "${ref}" "${staging}"
+            docker push --quiet "${staging}"
+          done < tags.txt
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: tags-${{ matrix.target.name }}-${{ matrix.arch.name }}
+          path: tags.txt
+
+  publish:
+    name: publish ${{ matrix.target.name }}
+    needs: [targets, build]
+    if: always() && needs.targets.result == 'success' && (github.event_name == 'schedule' || (github.event_name == 'workflow_dispatch' && inputs.publish))
+    runs-on: ubuntu-24.04
+    permissions:
+      contents: read
+      packages: read
+    strategy:
+      fail-fast: false
+      matrix:
+        target: ${{ fromJSON(needs.targets.outputs.matrix) }}
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          pattern: tags-${{ matrix.target.name }}-*
+          path: tags
+
+      - name: Check that both arches built the same tags
+        run: |
+          for arch in amd64 arm64; do
+            test -s "tags/tags-${{ matrix.target.name }}-${arch}/tags.txt" || { echo "::error::no ${arch} build for ${{ matrix.target.name }}"; exit 1; }
+          done
+          diff -u "tags/tags-${{ matrix.target.name }}-amd64/tags.txt" "tags/tags-${{ matrix.target.name }}-arm64/tags.txt"
+
+      - uses: docker/setup-buildx-action@v3
+
+      - uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      - name: Create multi-arch manifests on Docker Hub
+        run: |
+          while read -r ref; do
+            docker buildx imagetools create \
+              --tag "docker.io/${ref}" \
+              "${STAGING}/${ref#*/}-amd64" \
+              "${STAGING}/${ref#*/}-arm64"
+            echo "- ${ref}" >> "$GITHUB_STEP_SUMMARY"
+          done < "tags/tags-${{ matrix.target.name }}-amd64/tags.txt"
