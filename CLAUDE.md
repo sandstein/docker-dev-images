@@ -72,3 +72,11 @@ Touch all of these, they are not generated from each other:
 `.gitlab-ci.yml` runs on Sandstein's GitLab (runner tag `devimages`). Jobs are triggered by pipeline variables:
 `BUILD_TARGET=<target>` (e.g. `mariadb`, `php-cli-8.4`) builds one job, `BUILD_ALL=true` builds everything. Each job
 runs build → push → cleanup.
+
+### GitHub Actions (multi-arch, trial)
+
+`.github/workflows/build.yml` on the public mirror `github` (git@github.com:sandstein/docker-dev-images.git, default
+branch `master`) builds the maintained targets natively on amd64 and arm64 runners via `bin/build.sh`. Branch pushes
+and PRs only build; the weekly schedule and manual runs with `publish` push per-arch staging images to GHCR and merge
+them into `sandstein/<repo>:<tag>` on Docker Hub (secrets `DOCKERHUB_USERNAME`, `DOCKERHUB_TOKEN`). The target list
+lives in the workflow's `targets` job; keep it in sync with `build.sh`.
