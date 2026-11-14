@@ -69,8 +69,8 @@ Add it to its list in `docker-bake.hcl` (move `PHP_LATEST` for a new PHP), then 
 
 `.github/workflows/build.yml` runs on the public GitHub mirror (remote `github`,
 git@github.com:sandstein/docker-dev-images.git). It reads the targets from `docker buildx bake --print`, groups each
-PHP target with its `-prod` variant into one job and runs `bin/build.sh` natively on amd64 and arm64 runners. Branch
-pushes and PRs only build; the weekly schedule (Sundays 16:12 UTC, default branch only) and manual runs with `publish`
+PHP target with its `-prod` variant into one job and runs `bin/build.sh` natively on amd64 and arm64 runners. Pushing a tag
+only builds (branch pushes start nothing); the weekly schedule (Sundays 16:12 UTC, default branch only) and manual runs with `publish`
 push per-arch staging images to GHCR and merge them into multi-arch tags on Docker Hub (secrets `DOCKERHUB_USERNAME`,
 `DOCKERHUB_TOKEN`), only if both arches yield the same tag list. A manual run can build one target or group. GitLab CI
 and its schedules were removed (2026-11-14).
