@@ -66,8 +66,8 @@ $ bin/cleanup.sh <container>
 
 ### GitHub Actions
 `.github/workflows/build.yml` builds all catalog targets natively for `linux/amd64` and `linux/arm64`.
-Pushing a tag only builds; branch pushes start nothing. The weekly schedule (Sundays 16:12 UTC) and manual runs with *publish* checked
-push multi-arch images to Docker Hub (repository secrets `DOCKERHUB_USERNAME` and `DOCKERHUB_TOKEN`). A manual run
+Pushing a tag, the weekly schedule (Sundays 16:12 UTC) and manual runs with *publish* checked
+push multi-arch images to Docker Hub; branch pushes start nothing (repository secrets `DOCKERHUB_USERNAME` and `DOCKERHUB_TOKEN`). A manual run
 can also build a single target or group (e.g. `mariadb` or `php-cli-8-4`).
 
 ## Changing user and group IDs
