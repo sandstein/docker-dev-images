@@ -1,14 +1,15 @@
 # Builds the maintained image families natively on amd64 and arm64 runners and,
 # when publishing, merges both into multi-arch manifests on Docker Hub.
 #
-# - Each (target, arch) job runs bin/build.sh unchanged, so tag discovery stays in one place.
+# - The targets come from the catalog (docker-bake.hcl). A PHP target and its -prod variant
+#   share one job, so the common stages are built only once.
+# - Each (job, arch) runs bin/build.sh, so tagging and version checks stay in one place.
 # - Publishing pushes the per-arch images to GHCR as staging (<tag>-amd64 / <tag>-arm64),
-#   then the merge job creates sandstein/<repo>:<tag> from both. Both arches must yield
-#   the same tag list, otherwise nothing is published for that target.
+#   then the publish job creates sandstein/<repo>:<tag> from both. Both arches must yield
+#   the same tag list, otherwise nothing is published for that job.
 # - Branch pushes and pull requests only build. Publishing happens on the weekly schedule
 #   and on manual runs with "publish" checked (needs the DOCKERHUB_USERNAME and
 #   DOCKERHUB_TOKEN secrets).
-# - Frozen EOL versions (PHP <= 8.1, MariaDB 10.x, MySQL 5.7/8.0, Elasticsearch) are not built.
 
 name: build
 
@@ -26,7 +27,7 @@ on:
         type: boolean
         default: false
       target:
-        description: Only build this target (e.g. php-cli-8.4, mariadb); empty builds all
+        description: Only build this bake target or group (e.g. php-cli-8-4, php, mariadb); empty builds all
         type: string
         default: ''
 
@@ -47,31 +48,20 @@ jobs:
     outputs:
       matrix: ${{ steps.filter.outputs.matrix }}
     steps:
+      - uses: actions/checkout@v5
+
       - name: Select targets
         id: filter
         env:
           WANTED: ${{ inputs.target }}
         run: |
-          all='[
-            {"name":"ssh","repo":"ssh","args":"ssh"},
-            {"name":"selenium-side-runner","repo":"selenium-side-runner","args":"selenium-side-runner"},
-            {"name":"apache","repo":"apache","args":"apache"},
-            {"name":"mariadb","repo":"mariadb","args":"mariadb"},
-            {"name":"mysql","repo":"mysql","args":"mysql"},
-            {"name":"node","repo":"node","args":"node"},
-            {"name":"python","repo":"python","args":"python"},
-            {"name":"php-cli-8.2","repo":"php","args":"php cli 8.2"},
-            {"name":"php-cli-8.3","repo":"php","args":"php cli 8.3"},
-            {"name":"php-cli-8.4","repo":"php","args":"php cli 8.4"},
-            {"name":"php-cli-8.5","repo":"php","args":"php cli 8.5"},
-            {"name":"php-fpm-8.2","repo":"php","args":"php fpm 8.2"},
-            {"name":"php-fpm-8.3","repo":"php","args":"php fpm 8.3"},
-            {"name":"php-fpm-8.4","repo":"php","args":"php fpm 8.4"},
-            {"name":"php-fpm-8.5","repo":"php","args":"php fpm 8.5"}
-          ]'
-          matrix=$(jq -c --arg w "${WANTED:-}" 'map(select($w == "" or .name == $w))' <<< "$all")
-          if [[ $matrix == "[]" ]]; then echo "::error::unknown target ${WANTED}"; exit 1; fi
+          # [{"name":"php-cli-8-5","targets":"php-cli-8-5 php-cli-8-5-prod"}, ...]
+          matrix=$(docker buildx bake --print "${WANTED:-default}" 2>/dev/null \
+            | jq -c '.target | keys | group_by(sub("-prod$"; ""))
+                     | map({name: (.[0] | sub("-prod$"; "")), targets: join(" ")})')
+          if [[ -z $matrix || $matrix == "[]" ]]; then echo "::error::unknown target ${WANTED}"; exit 1; fi
           echo "matrix=${matrix}" >> "$GITHUB_OUTPUT"
+          jq . <<< "$matrix"
 
   build:
     name: ${{ matrix.target.name }} (${{ matrix.arch.name }})
@@ -88,19 +78,20 @@ jobs:
           - { name: arm64, runner: ubuntu-24.04-arm }
         target: ${{ fromJSON(needs.targets.outputs.matrix) }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
 
       - name: Build
         env:
           NAMESPACE: sandstein
-          ARGS: ${{ matrix.target.args }}
+          TAGS_FILE: tags.txt
+          TARGETS: ${{ matrix.target.targets }}
         run: |
-          # shellcheck disable=SC2086 # ARGS is intentionally split
-          bin/build.sh ${ARGS}
+          # shellcheck disable=SC2086 # TARGETS is intentionally split
+          bin/build.sh ${TARGETS}
 
       - name: List tags
         run: |
-          docker image ls "sandstein/${{ matrix.target.repo }}" --format '{{.Tag}}' | sort > tags.txt
+          sort -o tags.txt tags.txt
           test -s tags.txt
           echo "### ${{ matrix.target.name }} (${{ matrix.arch.name }})" >> "$GITHUB_STEP_SUMMARY"
           sed 's/^/- /' tags.txt >> "$GITHUB_STEP_SUMMARY"
@@ -117,9 +108,10 @@ jobs:
       - name: Push staging images
         if: env.PUBLISH == 'true'
         run: |
-          while read -r tag; do
-            staging="${STAGING}/${{ matrix.target.repo }}:${tag}-${{ matrix.arch.name }}"
-            docker tag "sandstein/${{ matrix.target.repo }}:${tag}" "${staging}"
+          # sandstein/php:cli-8.4 -> ghcr.io/<owner>/dev-images-staging/php:cli-8.4-amd64
+          while read -r ref; do
+            staging="${STAGING}/${ref#*/}-${{ matrix.arch.name }}"
+            docker tag "${ref}" "${staging}"
             docker push --quiet "${staging}"
           done < tags.txt
 
@@ -168,11 +160,10 @@ jobs:
 
       - name: Create multi-arch manifests on Docker Hub
         run: |
-          repo="${{ matrix.target.repo }}"
-          while read -r tag; do
+          while read -r ref; do
             docker buildx imagetools create \
-              --tag "docker.io/sandstein/${repo}:${tag}" \
-              "${STAGING}/${repo}:${tag}-amd64" \
-              "${STAGING}/${repo}:${tag}-arm64"
-            echo "sandstein/${repo}:${tag}" >> "$GITHUB_STEP_SUMMARY"
+              --tag "docker.io/${ref}" \
+              "${STAGING}/${ref#*/}-amd64" \
+              "${STAGING}/${ref#*/}-arm64"
+            echo "- ${ref}" >> "$GITHUB_STEP_SUMMARY"
           done < "tags/tags-${{ matrix.target.name }}-amd64/tags.txt"

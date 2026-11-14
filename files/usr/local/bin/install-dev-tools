@@ -1,0 +1,59 @@
+#!/bin/bash
+#
+# Installs the standard debugging tools of all sandstein images, plus the
+# packages given as arguments, and cleans up afterwards.
+#
+#   install-dev-tools [package ...]
+#
+# Debian based images get the full list and all locales; microdnf based images
+# (Oracle Linux, e.g. mysql) get the subset that exists there.
+
+set -o errexit
+set -o nounset
+set -o pipefail
+
+if command -v apt-get > /dev/null; then
+    apt-update
+    apt-install \
+        apt-transport-https \
+        ca-certificates \
+        locales \
+        gnupg \
+        procps \
+        wget \
+        curl \
+        vim \
+        net-tools \
+        tzdata \
+        zip \
+        unzip \
+        bzip2 \
+        moreutils \
+        dnsutils \
+        openssh-client \
+        rsync \
+        git \
+        patch \
+        "$@"
+    generate-locales
+    docker-image-cleanup
+elif command -v microdnf > /dev/null; then
+    microdnf install -y \
+        wget \
+        curl \
+        vim \
+        net-tools \
+        tzdata \
+        zip \
+        unzip \
+        bzip2 \
+        dnsutils \
+        rsync \
+        git \
+        patch \
+        "$@"
+    microdnf clean all
+else
+    echo "install-dev-tools: neither apt-get nor microdnf found" >&2
+    exit 1
+fi
