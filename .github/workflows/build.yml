@@ -109,10 +109,20 @@ jobs:
         if: env.PUBLISH == 'true'
         run: |
           # sandstein/php:cli-8.4 -> ghcr.io/<owner>/dev-images-staging/php:cli-8.4-amd64
+          # Retries: when both arches create a new GHCR package at the same time, one push gets "denied".
+          push() {
+            local attempt
+            for attempt in 1 2 3 4 5; do
+              docker push --quiet "$1" && return 0
+              echo "::warning::push of $1 failed (attempt ${attempt}), retrying"
+              sleep $((attempt * 10))
+            done
+            return 1
+          }
           while read -r ref; do
             staging="${STAGING}/${ref#*/}-${{ matrix.arch.name }}"
             docker tag "${ref}" "${staging}"
-            docker push --quiet "${staging}"
+            push "${staging}"
           done < tags.txt
 
       - uses: actions/upload-artifact@v4
