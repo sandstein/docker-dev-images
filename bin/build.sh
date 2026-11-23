@@ -24,7 +24,7 @@ TAGS_FILE=${TAGS_FILE:-}
 detect_version() {
   local repo=$1 image=$2 cmd
   case ${repo} in
-    php)                  cmd=(php -r 'echo PHP_VERSION;') ;;
+    php|php-deploy)       cmd=(php -r 'echo PHP_VERSION;') ;;
     mariadb)              cmd=(mariadbd --version) ;;
     mysql)                cmd=(mysqld --version) ;;
     node)                 cmd=(node -v) ;;

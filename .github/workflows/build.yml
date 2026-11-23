@@ -1,8 +1,8 @@
 # Builds the maintained image families natively on amd64 and arm64 runners and,
 # when publishing, merges both into multi-arch manifests on Docker Hub.
 #
-# - The targets come from the catalog (docker-bake.hcl). A PHP target and its -prod variant
-#   share one job, so the common stages are built only once.
+# - The targets come from the catalog (docker-bake.hcl). A PHP target shares one job with its
+#   -prod variant (and php-cli with php-deploy), so the common stages are built only once.
 # - Each (job, arch) runs bin/build.sh, so tagging and version checks stay in one place.
 # - Publishing pushes the per-arch images to GHCR as staging (<tag>-amd64 / <tag>-arm64),
 #   then the publish job creates sandstein/<repo>:<tag> from both. Both arches must yield
@@ -54,9 +54,10 @@ jobs:
         env:
           WANTED: ${{ inputs.target }}
         run: |
-          # [{"name":"php-cli-8-5","targets":"php-cli-8-5 php-cli-8-5-prod"}, ...]
+          # [{"name":"php-cli-8-5","targets":"php-cli-8-5 php-cli-8-5-prod php-deploy-8-5"}, ...]
           matrix=$(docker buildx bake --print "${WANTED:-default}" 2>/dev/null \
-            | jq -c '.target | keys | group_by(sub("-prod$"; ""))
+            | jq -c 'def job: sub("-prod$"; "") | sub("^php-deploy-"; "php-cli-");
+                     .target | keys | group_by(job)
                      | map({name: (.[0] | sub("-prod$"; "")), targets: join(" ")})')
           if [[ -z $matrix || $matrix == "[]" ]]; then echo "::error::unknown target ${WANTED}"; exit 1; fi
           echo "matrix=${matrix}" >> "$GITHUB_OUTPUT"

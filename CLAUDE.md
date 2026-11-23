@@ -37,7 +37,10 @@ docker run --rm --entrypoint '' test/php:cli-8.5 php -m   # inspect a built imag
 - **`docker/php/Dockerfile`** – stages `common` (tools + common extensions + `EXTENSIONS`), `cli` (git-flow,
   ghostscript, mariadb-client, solr, sourceguardian, `CLI_EXTENSIONS`, `phpcli` user), and the bake targets
   `cli-dev`/`fpm-dev` (xdebug, xhprof; cli also nodejs/npm) and `cli-prod`/`fpm-prod` (`php.ini-production`, tagged
-  `<type>-<version>-prod`). `install-php-extensions` is pinned once via `ARG INSTALLER_VERSION`.
+  `<type>-<version>-prod`), and `deploy` (on `cli-prod`: user `gitlab-runner` 999:999, composer, deployer pinned via
+  `ARG DEPLOYER_VERSION`, nodejs + nvm LTS, `files/php/deploy.ini`; target `php-deploy-<v>`, tagged
+  `sandstein/php-deploy:<version>`, used by GitLab CI deploy jobs, formerly the `docker-deploy-images` repo).
+  `install-php-extensions` is pinned once via `ARG INSTALLER_VERSION`.
 - **`files/usr/local/bin/`** – helper scripts copied into every image (`COPY files/usr/local/bin /usr/local/bin`):
   - `install-dev-tools [pkg …]` – the standard tool list for every image (apt or microdnf), plus extra packages, with
     cleanup. Change the common tool set there, not in the Dockerfiles.
@@ -69,7 +72,7 @@ Add it to its list in `docker-bake.hcl` (move `PHP_LATEST` for a new PHP), then 
 
 `.github/workflows/build.yml` runs on the public GitHub mirror (remote `github`,
 git@github.com:sandstein/docker-dev-images.git). It reads the targets from `docker buildx bake --print`, groups each
-PHP target with its `-prod` variant into one job and runs `bin/build.sh` natively on amd64 and arm64 runners. Tag pushes,
+PHP target with its `-prod` variant (and php-cli with php-deploy) into one job and runs `bin/build.sh` natively on amd64 and arm64 runners. Tag pushes,
 the weekly schedule (Sundays 16:12 UTC, default branch only) and manual runs with `publish` push per-arch staging images to GHCR and merge them into multi-arch tags on Docker Hub (secrets `DOCKERHUB_USERNAME`,
 `DOCKERHUB_TOKEN`), only if both arches yield the same tag list. Manual runs without `publish` only build; branch pushes start nothing. A manual run can build one target or group. GitLab CI
 and its schedules were removed (2026-11-14).
