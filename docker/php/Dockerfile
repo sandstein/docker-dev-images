@@ -9,6 +9,8 @@
 
 ARG VERSION=8.5
 ARG TYPE=cli
+# extensions to leave out for this version, e.g. not yet supported by the installer (docker-bake.hcl)
+ARG SKIP_EXTENSIONS=""
 
 FROM php:${VERSION}-${TYPE} AS common
 
@@ -25,8 +27,9 @@ ARG INSTALLER_VERSION=2.13.2
 ADD https://github.com/mlocati/docker-php-extension-installer/releases/download/${INSTALLER_VERSION}/install-php-extensions /usr/local/bin/
 
 ARG EXTENSIONS=""
+ARG SKIP_EXTENSIONS
 RUN chmod +x /usr/local/bin/install-php-extensions \
-    && install-php-extensions \
+    && install-php-extensions-except "${SKIP_EXTENSIONS}" \
       amqp \
       apcu \
       bcmath \
@@ -85,7 +88,8 @@ RUN install-dev-tools \
         mariadb-client
 
 ARG CLI_EXTENSIONS=""
-RUN install-php-extensions solr sourceguardian ${CLI_EXTENSIONS} \
+ARG SKIP_EXTENSIONS
+RUN install-php-extensions-except "${SKIP_EXTENSIONS}" solr sourceguardian ${CLI_EXTENSIONS} \
     && docker-image-cleanup
 
 # no VOLUME for the home directory: dde bind-mounts ~/.config and ~/.ssh
@@ -138,8 +142,9 @@ RUN composer global require "deployer/deployer:${DEPLOYER_VERSION}" \
     && nvm cache clear
 
 FROM cli AS cli-dev
+ARG SKIP_EXTENSIONS
 RUN install-dev-tools nodejs npm \
-    && install-php-extensions xdebug xhprof \
+    && install-php-extensions-except "${SKIP_EXTENSIONS}" xdebug xhprof \
     && docker-image-cleanup
 
 
@@ -149,5 +154,6 @@ FROM common AS fpm-prod
 RUN cp "${PHP_INI_DIR}/php.ini-production" "${PHP_INI_DIR}/php.ini"
 
 FROM common AS fpm-dev
-RUN install-php-extensions xdebug xhprof \
+ARG SKIP_EXTENSIONS
+RUN install-php-extensions-except "${SKIP_EXTENSIONS}" xdebug xhprof \
     && docker-image-cleanup

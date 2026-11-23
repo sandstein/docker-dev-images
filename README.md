@@ -152,7 +152,7 @@ for user customisation. The old images for node 11 to 18 stay on Docker Hub but 
 (`node:12` and `node:14` contained node 16).
 
 ### php
-PHP 8.2 to 8.5 as fpm and cli, each in two variants:
+PHP 8.2 to 8.6 as fpm and cli, each in two variants:
 
 - `sandstein/php:<type>-<version>` (e.g. `fpm-8.4`): development image with xdebug and xhprof, the cli images also
   with node and npm.
@@ -191,7 +191,10 @@ rebuilt.
 
 #### php modules
 The containers try to include all available modules. The common list is in `docker/php/Dockerfile`, version
-specific additions are in `docker-bake.hcl`. When using the containers, you can disable
+specific additions are in `docker-bake.hcl`. A version can also leave extensions out (`skip`), e.g. while the
+installer does not support them yet. PHP 8.6 is currently built without amqp, apcu, gnupg, grpc, imagick, imap, lzf,
+memcached, oauth, redis, xlswriter, xmlrpc, solr, sourceguardian and xdebug; `sandstein/php:latest` stays on 8.5
+until then. When using the containers, you can disable
 the modules in your config, e.g. with `disable-php-modules xdebug,xhprof`. If you miss something just add a PR,
 most of the modules are built with 
 [Docker PHP-Extension Installer](https://github.com/mlocati/docker-php-extension-installer), so if a module can be

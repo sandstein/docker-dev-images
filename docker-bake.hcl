@@ -23,12 +23,18 @@ variable "PLATFORMS" {
 
 # version => extensions on top of the common list in docker/php/Dockerfile
 #   all: cli and fpm, cli: cli only
+#   skip (optional): extensions of any list to leave out, e.g. not yet supported by
+#     docker-php-extension-installer for a new PHP version (see its data/supported-extensions)
 variable "PHP" {
   default = {
     "8.2" = { all = "mcrypt memcache", cli = "ioncube_loader" }
     "8.3" = { all = "mcrypt memcache", cli = "" }
     "8.4" = { all = "memcache", cli = "" }
     "8.5" = { all = "", cli = "" }
+    "8.6" = {
+      all  = "", cli = ""
+      skip = "amqp apcu gnupg grpc imagick imap lzf memcached oauth redis xlswriter xmlrpc solr sourceguardian xdebug"
+    }
   }
 }
 variable "PHP_LATEST" { default = "8.5" } # gets sandstein/php:latest (cli, dev)
@@ -80,7 +86,8 @@ target "php" {
     VERSION        = v
     TYPE           = type
     EXTENSIONS     = PHP[v].all
-    CLI_EXTENSIONS = PHP[v].cli
+    CLI_EXTENSIONS  = PHP[v].cli
+    SKIP_EXTENSIONS = lookup(PHP[v], "skip", "")
   }
   tags = concat(
     ["${NAMESPACE}/php:${type}-${v}${variant == "dev" ? "" : "-${variant}"}"],
@@ -100,6 +107,7 @@ target "php-deploy" {
     TYPE           = "cli"
     EXTENSIONS     = PHP[v].all
     CLI_EXTENSIONS   = PHP[v].cli
+    SKIP_EXTENSIONS  = lookup(PHP[v], "skip", "")
     DEPLOYER_VERSION = lookup(DEPLOYER, v, "^8")
   }
   tags = ["${NAMESPACE}/php-deploy:${v}"]

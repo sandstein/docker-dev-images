@@ -28,7 +28,9 @@ docker run --rm --entrypoint '' test/php:cli-8.5 php -m   # inspect a built imag
 ## Architecture
 
 - **`docker-bake.hcl`** – the catalog and the only place where versions live. Variables `PHP` (version => extra
-  extensions `{all, cli}`), `PHP_LATEST`, `MARIADB`, `MYSQL`, `NODE`, `PYTHON`, `APACHE`; matrix targets expand to
+  extensions `{all, cli}`, optional `skip` = extensions left out of every install step via
+  `install-php-extensions-except`, for extensions mlocati does not support yet on a new PHP version; check
+  `data/supported-extensions` of the pinned installer release and shrink `skip` when support arrives), `PHP_LATEST`, `MARIADB`, `MYSQL`, `NODE`, `PYTHON`, `APACHE`; matrix targets expand to
   `<family>-<version>` (dots become dashes), each matrix is also a group, `default` builds everything. The first tag of
   a target is its minor tag; the last list entry gets `latest`.
 - **`docker/<family>/Dockerfile`** – one Dockerfile per family, the version comes in as `ARG VERSION` (ssh: Debian
@@ -47,7 +49,7 @@ docker run --rm --entrypoint '' test/php:cli-8.5 php -m   # inspect a built imag
   - `apt-update` / `apt-install` / `docker-image-cleanup` – the pattern for installing other packages in a layer.
   - `modify-user-ids <user> <uid> <gid>` – used by downstream dde Dockerfiles to remap the default user
     (`www-data` for php-fpm/apache, `phpcli` (UID 1000) for php-cli, `mysql`, `node`, `python`, `ssh`).
-  - `generate-locales`, `disable-php-modules`.
+  - `generate-locales`, `disable-php-modules`, `install-php-extensions-except "<skip>" ext…` (php: install without the `skip` list).
 - Every image sets `LABEL de.sandstein.dde="<family>"`; `bin/cleanup.sh` relies on it.
 - Frozen (EOL) versions are not in the repo anymore (PHP 7.3–8.1, MariaDB 10.x, MySQL 5.7/8.0, Elasticsearch, percona,
   solr); their images stay on Docker Hub, their sources are at tag `26.11.13`.
