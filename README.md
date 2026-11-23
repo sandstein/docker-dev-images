@@ -19,7 +19,7 @@ argument. Show all targets with their tags:
 $ docker buildx bake --print
 ```
 Targets are named after family and version with `-` instead of `.`, e.g. `php-cli-8-4`, `php-fpm-8-4-prod`,
-`mariadb-11-8`. Every matrix (e.g. `php`, `node`) is also a group.
+`php-deploy-8-4`, `mariadb-11-8`. Every matrix (e.g. `php`, `node`) is also a group.
 
 ### Adding a version
 Add the version to its list in `docker-bake.hcl`, e.g. `"8.6" = { all = "", cli = "" }` to `PHP` or `"12.0"` to
@@ -175,6 +175,19 @@ ARG GROUP_ID=1000
 RUN modify-user-ids phpcli ${USER_ID} ${GROUP_ID}
 ```
 for the cli containers. `sandstein/php:latest` is the newest cli development image.
+
+#### php-deploy
+`sandstein/php-deploy:<version>` (e.g. `8.4`, also `8.4.<patch>`) is the image for deployment jobs in GitLab CI. It
+is built on `cli-<version>-prod` and adds:
+
+- the user `gitlab-runner` (UID/GID 999) instead of `phpcli`, home `/home/gitlab-runner`
+- composer and [Deployer](https://deployer.org/) (`dep`, major version pinned per PHP version with `DEPLOYER` in
+  `docker-bake.hcl`: `^8`, `^7` for PHP 8.2 because Deployer 8 needs PHP 8.3) in `~/bin`
+- Debian's nodejs/npm, plus nvm with the current node LTS for shells that source `~/.nvm/nvm.sh`
+- `memory_limit = -1` and `date.timezone = Europe/Berlin` on top of `php.ini-production`
+
+It used to be built in the separate `docker-deploy-images` repository; the 8.1 image stays on Docker Hub but is not
+rebuilt.
 
 #### php modules
 The containers try to include all available modules. The common list is in `docker/php/Dockerfile`, version

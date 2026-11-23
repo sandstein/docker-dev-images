@@ -7,7 +7,7 @@
 # newest). Removing a version freezes it: its images stay on Docker Hub but are no longer rebuilt.
 # Frozen (EOL) sources live in git history, see tag 26.11.13.
 #
-# Target names use "-" instead of ".", e.g. php-cli-8-4, php-fpm-8-4-prod, mariadb-11-8.
+# Target names use "-" instead of ".", e.g. php-cli-8-4, php-fpm-8-4-prod, php-deploy-8-4, mariadb-11-8.
 # The first tag of a target is its minor tag; bin/build.sh derives the patch tag from it.
 
 variable "NAMESPACE" {
@@ -33,6 +33,11 @@ variable "PHP" {
 }
 variable "PHP_LATEST" { default = "8.5" } # gets sandstein/php:latest (cli, dev)
 
+# deployer constraint for php-deploy: "^8" unless listed here (deployer 8 needs PHP 8.3+)
+variable "DEPLOYER" {
+  default = { "8.2" = "^7" }
+}
+
 variable "MARIADB" { default = ["11.4", "11.8"] }
 variable "MYSQL" { default = ["8.4"] }
 variable "NODE" { default = ["22", "24", "26"] }
@@ -44,7 +49,7 @@ variable "APACHE" { default = ["2.4"] }
 # --- groups --------------------------------------------------------------------
 
 group "default" {
-  targets = ["php", "mariadb", "mysql", "node", "python", "apache", "ssh", "selenium-side-runner"]
+  targets = ["php", "php-deploy", "mariadb", "mysql", "node", "python", "apache", "ssh", "selenium-side-runner"]
 }
 
 # --- targets -------------------------------------------------------------------
@@ -81,6 +86,23 @@ target "php" {
     ["${NAMESPACE}/php:${type}-${v}${variant == "dev" ? "" : "-${variant}"}"],
     type == "cli" && variant == "dev" && v == PHP_LATEST ? ["${NAMESPACE}/php:latest"] : []
   )
+}
+
+# GitLab CI deployment image on top of cli-prod, see the deploy stage in docker/php/Dockerfile
+target "php-deploy" {
+  inherits   = ["_common"]
+  name       = "php-deploy-${dash(v)}"
+  matrix     = { v = keys(PHP) }
+  dockerfile = "docker/php/Dockerfile"
+  target     = "deploy"
+  args = {
+    VERSION        = v
+    TYPE           = "cli"
+    EXTENSIONS     = PHP[v].all
+    CLI_EXTENSIONS   = PHP[v].cli
+    DEPLOYER_VERSION = lookup(DEPLOYER, v, "^8")
+  }
+  tags = ["${NAMESPACE}/php-deploy:${v}"]
 }
 
 target "mariadb" {

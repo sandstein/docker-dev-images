@@ -98,6 +98,45 @@ RUN groupadd -g 1000 phpcli \
 FROM cli AS cli-prod
 RUN cp "${PHP_INI_DIR}/php.ini-production" "${PHP_INI_DIR}/php.ini"
 
+# Deployment image for GitLab CI jobs (sandstein/php-deploy:<version>): runs as gitlab-runner
+# (UID/GID 999), ships composer, deployer (dep) and node (Debian nodejs on PATH, nvm LTS for
+# shells that source nvm).
+FROM composer:2 AS composer
+
+FROM cli-prod AS deploy
+
+LABEL de.sandstein.deploy="php"
+
+COPY files/php/deploy.ini "${PHP_INI_DIR}/conf.d/zz-deploy.ini"
+
+RUN install-dev-tools nodejs npm
+
+RUN usermod -l gitlab-runner -d /home/gitlab-runner -m phpcli \
+    && groupmod -n gitlab-runner phpcli \
+    && modify-user-ids gitlab-runner 999 999 \
+    && mkdir -p /home/gitlab-runner/bin /home/gitlab-runner/.ssh \
+    && chmod 700 /home/gitlab-runner/.ssh
+
+COPY --from=composer /usr/bin/composer /home/gitlab-runner/bin/composer
+RUN chown -R gitlab-runner:gitlab-runner /home/gitlab-runner
+
+ENV PATH="/home/gitlab-runner/bin:${PATH}"
+USER gitlab-runner:gitlab-runner
+WORKDIR /home/gitlab-runner
+
+# pinned major (set per PHP version in docker-bake.hcl): the weekly rebuild must not switch
+# deployer majors under running projects
+ARG DEPLOYER_VERSION=^8
+ARG NVM_VERSION=v0.40.4
+RUN composer global require "deployer/deployer:${DEPLOYER_VERSION}" \
+    && ln -s ../.composer/vendor/bin/dep bin/dep \
+    && composer clear-cache \
+    && wget -qO- "https://raw.githubusercontent.com/nvm-sh/nvm/${NVM_VERSION}/install.sh" | bash \
+    && export NVM_DIR="${HOME}/.nvm" \
+    && . "${NVM_DIR}/nvm.sh" --no-use \
+    && nvm install --lts \
+    && nvm cache clear
+
 FROM cli AS cli-dev
 RUN install-dev-tools nodejs npm \
     && install-php-extensions xdebug xhprof \
