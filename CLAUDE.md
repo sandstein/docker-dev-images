@@ -37,8 +37,8 @@ docker run --rm --entrypoint '' test/php:cli-8.5 php -m   # inspect a built imag
 - **`docker/php/Dockerfile`** – stages `common` (tools + common extensions + `EXTENSIONS`), `cli` (git-flow,
   ghostscript, mariadb-client, solr, sourceguardian, `CLI_EXTENSIONS`, `phpcli` user), and the bake targets
   `cli-dev`/`fpm-dev` (xdebug, xhprof; cli also nodejs/npm) and `cli-prod`/`fpm-prod` (`php.ini-production`, tagged
-  `<type>-<version>-prod`), and `deploy` (on `cli-prod`: user `gitlab-runner` 999:999, composer, deployer pinned via
-  `ARG DEPLOYER_VERSION`, nodejs + nvm LTS, `files/php/deploy.ini`; target `php-deploy-<v>`, tagged
+  `<type>-<version>-prod`), and `deploy` (on `cli-prod`: user `gitlab-runner` 999:999, composer, deployer pinned per PHP
+  version via the catalog's `DEPLOYER` map (`^8`, `^7` for 8.2), nodejs + nvm LTS, `files/php/deploy.ini`; target `php-deploy-<v>`, tagged
   `sandstein/php-deploy:<version>`, used by GitLab CI deploy jobs, formerly the `docker-deploy-images` repo).
   `install-php-extensions` is pinned once via `ARG INSTALLER_VERSION`.
 - **`files/usr/local/bin/`** – helper scripts copied into every image (`COPY files/usr/local/bin /usr/local/bin`):

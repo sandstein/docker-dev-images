@@ -181,8 +181,8 @@ for the cli containers. `sandstein/php:latest` is the newest cli development ima
 is built on `cli-<version>-prod` and adds:
 
 - the user `gitlab-runner` (UID/GID 999) instead of `phpcli`, home `/home/gitlab-runner`
-- composer and [Deployer](https://deployer.org/) (`dep`, major version pinned with `DEPLOYER_VERSION` in
-  `docker/php/Dockerfile`) in `~/bin`
+- composer and [Deployer](https://deployer.org/) (`dep`, major version pinned per PHP version with `DEPLOYER` in
+  `docker-bake.hcl`: `^8`, `^7` for PHP 8.2 because Deployer 8 needs PHP 8.3) in `~/bin`
 - Debian's nodejs/npm, plus nvm with the current node LTS for shells that source `~/.nvm/nvm.sh`
 - `memory_limit = -1` and `date.timezone = Europe/Berlin` on top of `php.ini-production`
 

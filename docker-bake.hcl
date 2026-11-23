@@ -33,6 +33,11 @@ variable "PHP" {
 }
 variable "PHP_LATEST" { default = "8.5" } # gets sandstein/php:latest (cli, dev)
 
+# deployer constraint for php-deploy: "^8" unless listed here (deployer 8 needs PHP 8.3+)
+variable "DEPLOYER" {
+  default = { "8.2" = "^7" }
+}
+
 variable "MARIADB" { default = ["11.4", "11.8"] }
 variable "MYSQL" { default = ["8.4"] }
 variable "NODE" { default = ["22", "24", "26"] }
@@ -94,7 +99,8 @@ target "php-deploy" {
     VERSION        = v
     TYPE           = "cli"
     EXTENSIONS     = PHP[v].all
-    CLI_EXTENSIONS = PHP[v].cli
+    CLI_EXTENSIONS   = PHP[v].cli
+    DEPLOYER_VERSION = lookup(DEPLOYER, v, "^8")
   }
   tags = ["${NAMESPACE}/php-deploy:${v}"]
 }

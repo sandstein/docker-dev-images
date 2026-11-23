@@ -124,7 +124,8 @@ ENV PATH="/home/gitlab-runner/bin:${PATH}"
 USER gitlab-runner:gitlab-runner
 WORKDIR /home/gitlab-runner
 
-# pinned major: the weekly rebuild must not switch deployer majors under running projects
+# pinned major (set per PHP version in docker-bake.hcl): the weekly rebuild must not switch
+# deployer majors under running projects
 ARG DEPLOYER_VERSION=^8
 ARG NVM_VERSION=v0.40.4
 RUN composer global require "deployer/deployer:${DEPLOYER_VERSION}" \
