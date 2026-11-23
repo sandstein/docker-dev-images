@@ -19,7 +19,7 @@ argument. Show all targets with their tags:
 $ docker buildx bake --print
 ```
 Targets are named after family and version with `-` instead of `.`, e.g. `php-cli-8-4`, `php-fpm-8-4-prod`,
-`mariadb-11-8`. Every matrix (e.g. `php`, `node`) is also a group.
+`php-deploy-8-4`, `mariadb-11-8`. Every matrix (e.g. `php`, `node`) is also a group.
 
 ### Adding a version
 Add the version to its list in `docker-bake.hcl`, e.g. `"8.6" = { all = "", cli = "" }` to `PHP` or `"12.0"` to
@@ -152,7 +152,7 @@ for user customisation. The old images for node 11 to 18 stay on Docker Hub but 
 (`node:12` and `node:14` contained node 16).
 
 ### php
-PHP 8.2 to 8.5 as fpm and cli, each in two variants:
+PHP 8.2 to 8.6 as fpm and cli, each in two variants:
 
 - `sandstein/php:<type>-<version>` (e.g. `fpm-8.4`): development image with xdebug and xhprof, the cli images also
   with node and npm.
@@ -176,9 +176,25 @@ RUN modify-user-ids phpcli ${USER_ID} ${GROUP_ID}
 ```
 for the cli containers. `sandstein/php:latest` is the newest cli development image.
 
+#### php-deploy
+`sandstein/php-deploy:<version>` (e.g. `8.4`, also `8.4.<patch>`) is the image for deployment jobs in GitLab CI. It
+is built on `cli-<version>-prod` and adds:
+
+- the user `gitlab-runner` (UID/GID 999) instead of `phpcli`, home `/home/gitlab-runner`
+- composer and [Deployer](https://deployer.org/) (`dep`, major version pinned per PHP version with `DEPLOYER` in
+  `docker-bake.hcl`: `^8`, `^7` for PHP 8.2 because Deployer 8 needs PHP 8.3) in `~/bin`
+- Debian's nodejs/npm, plus nvm with the current node LTS for shells that source `~/.nvm/nvm.sh`
+- `memory_limit = -1` and `date.timezone = Europe/Berlin` on top of `php.ini-production`
+
+It used to be built in the separate `docker-deploy-images` repository; the 8.1 image stays on Docker Hub but is not
+rebuilt.
+
 #### php modules
 The containers try to include all available modules. The common list is in `docker/php/Dockerfile`, version
-specific additions are in `docker-bake.hcl`. When using the containers, you can disable
+specific additions are in `docker-bake.hcl`. A version can also leave extensions out (`skip`), e.g. while the
+installer does not support them yet. PHP 8.6 is currently built without amqp, apcu, gnupg, grpc, imagick, imap, lzf,
+memcached, oauth, redis, xlswriter, xmlrpc, solr, sourceguardian and xdebug; `sandstein/php:latest` stays on 8.5
+until then. When using the containers, you can disable
 the modules in your config, e.g. with `disable-php-modules xdebug,xhprof`. If you miss something just add a PR,
 most of the modules are built with 
 [Docker PHP-Extension Installer](https://github.com/mlocati/docker-php-extension-installer), so if a module can be

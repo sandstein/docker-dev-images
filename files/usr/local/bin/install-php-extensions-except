@@ -1,0 +1,38 @@
+#!/bin/bash
+#
+# install-php-extensions-except "<skip list>" <extension> ...
+#
+# Runs install-php-extensions for the given extensions without the ones in the
+# space separated skip list (e.g. extensions that mlocati's installer does not support
+# yet for a new PHP version, set per version in docker-bake.hcl). Does nothing if no
+# extension is left.
+
+set -o nounset
+set -o errexit
+set -o pipefail
+
+if [[ $# -lt 1 ]]; then
+    echo 'usage: install-php-extensions-except "<skip list>" <extension> ...' >&2
+    exit 2
+fi
+
+read -r -a skip <<< "$1"
+shift
+
+wanted=()
+for extension in "$@"; do
+    for skipped in "${skip[@]}"; do
+        if [[ ${extension} == "${skipped}" ]]; then
+            echo "install-php-extensions-except: skipping ${extension}"
+            continue 2
+        fi
+    done
+    wanted+=("${extension}")
+done
+
+if [[ ${#wanted[@]} -eq 0 ]]; then
+    echo "install-php-extensions-except: nothing to install"
+    exit 0
+fi
+
+install-php-extensions "${wanted[@]}"

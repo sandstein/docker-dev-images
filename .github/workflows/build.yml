@@ -1,8 +1,8 @@
 # Builds the maintained image families natively on amd64 and arm64 runners and,
 # when publishing, merges both into multi-arch manifests on Docker Hub.
 #
-# - The targets come from the catalog (docker-bake.hcl). A PHP target and its -prod variant
-#   share one job, so the common stages are built only once.
+# - The targets come from the catalog (docker-bake.hcl). A PHP target shares one job with its
+#   -prod variant (and php-cli with php-deploy), so the common stages are built only once.
 # - Each (job, arch) runs bin/build.sh, so tagging and version checks stay in one place.
 # - Publishing pushes the per-arch images to GHCR as staging (<tag>-amd64 / <tag>-arm64),
 #   then the publish job creates sandstein/<repo>:<tag> from both. Both arches must yield
@@ -47,16 +47,17 @@ jobs:
     outputs:
       matrix: ${{ steps.filter.outputs.matrix }}
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v7
 
       - name: Select targets
         id: filter
         env:
           WANTED: ${{ inputs.target }}
         run: |
-          # [{"name":"php-cli-8-5","targets":"php-cli-8-5 php-cli-8-5-prod"}, ...]
+          # [{"name":"php-cli-8-5","targets":"php-cli-8-5 php-cli-8-5-prod php-deploy-8-5"}, ...]
           matrix=$(docker buildx bake --print "${WANTED:-default}" 2>/dev/null \
-            | jq -c '.target | keys | group_by(sub("-prod$"; ""))
+            | jq -c 'def job: sub("-prod$"; "") | sub("^php-deploy-"; "php-cli-");
+                     .target | keys | group_by(job)
                      | map({name: (.[0] | sub("-prod$"; "")), targets: join(" ")})')
           if [[ -z $matrix || $matrix == "[]" ]]; then echo "::error::unknown target ${WANTED}"; exit 1; fi
           echo "matrix=${matrix}" >> "$GITHUB_OUTPUT"
@@ -77,7 +78,7 @@ jobs:
           - { name: arm64, runner: ubuntu-24.04-arm }
         target: ${{ fromJSON(needs.targets.outputs.matrix) }}
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v7
 
       - name: Build
         env:
@@ -98,7 +99,7 @@ jobs:
 
       - name: Log in to GHCR
         if: env.PUBLISH == 'true'
-        uses: docker/login-action@v3
+        uses: docker/login-action@v4
         with:
           registry: ghcr.io
           username: ${{ github.actor }}
@@ -124,7 +125,7 @@ jobs:
             push "${staging}"
           done < tags.txt
 
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         with:
           name: tags-${{ matrix.target.name }}-${{ matrix.arch.name }}
           path: tags.txt
@@ -143,7 +144,7 @@ jobs:
       matrix:
         target: ${{ fromJSON(needs.targets.outputs.matrix) }}
     steps:
-      - uses: actions/download-artifact@v4
+      - uses: actions/download-artifact@v8
         with:
           pattern: tags-${{ matrix.target.name }}-*
           path: tags
@@ -155,15 +156,15 @@ jobs:
           done
           diff -u "tags/tags-${{ matrix.target.name }}-amd64/tags.txt" "tags/tags-${{ matrix.target.name }}-arm64/tags.txt"
 
-      - uses: docker/setup-buildx-action@v3
+      - uses: docker/setup-buildx-action@v4
 
-      - uses: docker/login-action@v3
+      - uses: docker/login-action@v4
         with:
           registry: ghcr.io
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
-      - uses: docker/login-action@v3
+      - uses: docker/login-action@v4
         with:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}

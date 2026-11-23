@@ -28,7 +28,9 @@ docker run --rm --entrypoint '' test/php:cli-8.5 php -m   # inspect a built imag
 ## Architecture
 
 - **`docker-bake.hcl`** – the catalog and the only place where versions live. Variables `PHP` (version => extra
-  extensions `{all, cli}`), `PHP_LATEST`, `MARIADB`, `MYSQL`, `NODE`, `PYTHON`, `APACHE`; matrix targets expand to
+  extensions `{all, cli}`, optional `skip` = extensions left out of every install step via
+  `install-php-extensions-except`, for extensions mlocati does not support yet on a new PHP version; check
+  `data/supported-extensions` of the pinned installer release and shrink `skip` when support arrives), `PHP_LATEST`, `MARIADB`, `MYSQL`, `NODE`, `PYTHON`, `APACHE`; matrix targets expand to
   `<family>-<version>` (dots become dashes), each matrix is also a group, `default` builds everything. The first tag of
   a target is its minor tag; the last list entry gets `latest`.
 - **`docker/<family>/Dockerfile`** – one Dockerfile per family, the version comes in as `ARG VERSION` (ssh: Debian
@@ -37,14 +39,17 @@ docker run --rm --entrypoint '' test/php:cli-8.5 php -m   # inspect a built imag
 - **`docker/php/Dockerfile`** – stages `common` (tools + common extensions + `EXTENSIONS`), `cli` (git-flow,
   ghostscript, mariadb-client, solr, sourceguardian, `CLI_EXTENSIONS`, `phpcli` user), and the bake targets
   `cli-dev`/`fpm-dev` (xdebug, xhprof; cli also nodejs/npm) and `cli-prod`/`fpm-prod` (`php.ini-production`, tagged
-  `<type>-<version>-prod`). `install-php-extensions` is pinned once via `ARG INSTALLER_VERSION`.
+  `<type>-<version>-prod`), and `deploy` (on `cli-prod`: user `gitlab-runner` 999:999, composer, deployer pinned per PHP
+  version via the catalog's `DEPLOYER` map (`^8`, `^7` for 8.2), nodejs + nvm LTS, `files/php/deploy.ini`; target `php-deploy-<v>`, tagged
+  `sandstein/php-deploy:<version>`, used by GitLab CI deploy jobs, formerly the `docker-deploy-images` repo).
+  `install-php-extensions` is pinned once via `ARG INSTALLER_VERSION`.
 - **`files/usr/local/bin/`** – helper scripts copied into every image (`COPY files/usr/local/bin /usr/local/bin`):
   - `install-dev-tools [pkg …]` – the standard tool list for every image (apt or microdnf), plus extra packages, with
     cleanup. Change the common tool set there, not in the Dockerfiles.
   - `apt-update` / `apt-install` / `docker-image-cleanup` – the pattern for installing other packages in a layer.
   - `modify-user-ids <user> <uid> <gid>` – used by downstream dde Dockerfiles to remap the default user
     (`www-data` for php-fpm/apache, `phpcli` (UID 1000) for php-cli, `mysql`, `node`, `python`, `ssh`).
-  - `generate-locales`, `disable-php-modules`.
+  - `generate-locales`, `disable-php-modules`, `install-php-extensions-except "<skip>" ext…` (php: install without the `skip` list).
 - Every image sets `LABEL de.sandstein.dde="<family>"`; `bin/cleanup.sh` relies on it.
 - Frozen (EOL) versions are not in the repo anymore (PHP 7.3–8.1, MariaDB 10.x, MySQL 5.7/8.0, Elasticsearch, percona,
   solr); their images stay on Docker Hub, their sources are at tag `26.11.13`.
@@ -69,7 +74,7 @@ Add it to its list in `docker-bake.hcl` (move `PHP_LATEST` for a new PHP), then 
 
 `.github/workflows/build.yml` runs on the public GitHub mirror (remote `github`,
 git@github.com:sandstein/docker-dev-images.git). It reads the targets from `docker buildx bake --print`, groups each
-PHP target with its `-prod` variant into one job and runs `bin/build.sh` natively on amd64 and arm64 runners. Tag pushes,
+PHP target with its `-prod` variant (and php-cli with php-deploy) into one job and runs `bin/build.sh` natively on amd64 and arm64 runners. Tag pushes,
 the weekly schedule (Sundays 16:12 UTC, default branch only) and manual runs with `publish` push per-arch staging images to GHCR and merge them into multi-arch tags on Docker Hub (secrets `DOCKERHUB_USERNAME`,
 `DOCKERHUB_TOKEN`), only if both arches yield the same tag list. Manual runs without `publish` only build; branch pushes start nothing. A manual run can build one target or group. GitLab CI
 and its schedules were removed (2026-11-14).
